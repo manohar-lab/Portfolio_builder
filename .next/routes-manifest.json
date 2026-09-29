@@ -103,6 +103,14 @@
       "namedRegex": "^/dashboard/portfolio/(?<nxtPid>[^/]+?)/template(?:/)?$"
     },
     {
+      "page": "/templates/[id]",
+      "regex": "^/templates/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/templates/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/u/[username]",
       "regex": "^/u/([^/]+?)(?:/)?$",
       "routeKeys": {
@@ -167,6 +175,12 @@
       "namedRegex": "^/onboarding(?:/)?$"
     },
     {
+      "page": "/privacy",
+      "regex": "^/privacy(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/privacy(?:/)?$"
+    },
+    {
       "page": "/robots.txt",
       "regex": "^/robots\\.txt(?:/)?$",
       "routeKeys": {},
@@ -177,6 +191,18 @@
       "regex": "^/sitemap\\.xml(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/sitemap\\.xml(?:/)?$"
+    },
+    {
+      "page": "/templates",
+      "regex": "^/templates(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/templates(?:/)?$"
+    },
+    {
+      "page": "/terms",
+      "regex": "^/terms(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/terms(?:/)?$"
     }
   ],
   "dataRoutes": [],
