@@ -1,0 +1,227 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import {
+  createPortfolio,
+  updatePortfolioMeta,
+  deletePortfolio,
+} from "@/database/portfolio-service";
+import {
+  updateProfile,
+  saveProject,
+  deleteProject,
+  saveEducation,
+  deleteEducation,
+  saveSkill,
+  deleteSkill,
+  saveExperience,
+  deleteExperience,
+  saveResearch,
+  deleteResearch,
+  saveAchievement,
+  deleteAchievement,
+  saveCertification,
+  deleteCertification,
+  saveSocialLink,
+  deleteSocialLink,
+} from "@/database/section-services";
+import { CreatePortfolioSchema } from "@/validation/portfolio.schema";
+import {
+  ProjectItem,
+  EducationItem,
+  SkillItem,
+  ExperienceItem,
+  ResearchItem,
+  AchievementItem,
+  CertificationItem,
+  SocialLink,
+  UserProfile,
+} from "@/types/portfolio";
+
+export async function createPortfolioAction(formData: FormData) {
+  const title = formData.get("title") as string;
+  const slug = formData.get("slug") as string;
+  const templateId = (formData.get("templateId") as string) || "developer";
+  const description = (formData.get("description") as string) || "";
+
+  const validation = CreatePortfolioSchema.safeParse({ title, slug, templateId, description });
+  if (!validation.success) {
+    return { success: false, error: validation.error.errors[0].message };
+  }
+
+  const result = await createPortfolio({
+    title,
+    slug,
+    templateId,
+    description,
+  });
+
+  if (result.success) {
+    revalidatePath("/dashboard");
+  }
+
+  return result;
+}
+
+export async function updatePortfolioStatusAction(portfolioId: string, isPublished: boolean) {
+  const result = await updatePortfolioMeta(portfolioId, { isPublished, status: isPublished ? "PUBLISHED" : "DRAFT" });
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+    revalidatePath("/dashboard");
+  }
+  return result;
+}
+
+export async function updateTemplateAction(portfolioId: string, templateId: string) {
+  const result = await updatePortfolioMeta(portfolioId, { templateId });
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+    revalidatePath(`/dashboard/portfolio/${portfolioId}/template`);
+    revalidatePath("/dashboard");
+  }
+  return result;
+}
+
+export async function deletePortfolioAction(portfolioId: string) {
+  const result = await deletePortfolio(portfolioId);
+  if (result.success) {
+    revalidatePath("/dashboard");
+  }
+  return result;
+}
+
+export async function updateProfileAction(profileData: UserProfile, portfolioId: string) {
+  const result = await updateProfile(profileData);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}
+
+export async function saveProjectAction(portfolioId: string, project: ProjectItem) {
+  const result = await saveProject(portfolioId, project);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}
+
+export async function deleteProjectAction(portfolioId: string, projectId: string) {
+  const result = await deleteProject(portfolioId, projectId);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}
+
+export async function saveEducationAction(portfolioId: string, edu: EducationItem) {
+  const result = await saveEducation(portfolioId, edu);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}
+
+export async function deleteEducationAction(portfolioId: string, eduId: string) {
+  const result = await deleteEducation(portfolioId, eduId);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}
+
+export async function saveSkillAction(portfolioId: string, skill: SkillItem) {
+  const result = await saveSkill(portfolioId, skill);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}
+
+export async function deleteSkillAction(portfolioId: string, skillId: string) {
+  const result = await deleteSkill(portfolioId, skillId);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}
+
+export async function saveExperienceAction(portfolioId: string, exp: ExperienceItem) {
+  const result = await saveExperience(portfolioId, exp);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}
+
+export async function deleteExperienceAction(portfolioId: string, expId: string) {
+  const result = await deleteExperience(portfolioId, expId);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}
+
+export async function saveResearchAction(portfolioId: string, res: ResearchItem) {
+  const result = await saveResearch(portfolioId, res);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}
+
+export async function deleteResearchAction(portfolioId: string, resId: string) {
+  const result = await deleteResearch(portfolioId, resId);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}
+
+export async function saveAchievementAction(portfolioId: string, ach: AchievementItem) {
+  const result = await saveAchievement(portfolioId, ach);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}
+
+export async function deleteAchievementAction(portfolioId: string, achId: string) {
+  const result = await deleteAchievement(portfolioId, achId);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}
+
+export async function saveCertificationAction(portfolioId: string, cert: CertificationItem) {
+  const result = await saveCertification(portfolioId, cert);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}
+
+export async function deleteCertificationAction(portfolioId: string, certId: string) {
+  const result = await deleteCertification(portfolioId, certId);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}
+
+export async function saveSocialLinkAction(portfolioId: string, link: SocialLink) {
+  const result = await saveSocialLink(portfolioId, link);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}
+
+export async function deleteSocialLinkAction(portfolioId: string, linkId: string) {
+  const result = await deleteSocialLink(portfolioId, linkId);
+  if (result.success) {
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+  }
+  return result;
+}

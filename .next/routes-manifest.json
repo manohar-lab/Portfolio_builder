@@ -1,0 +1,168 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "dynamicRoutes": [
+    {
+      "page": "/dashboard/portfolio/[id]",
+      "regex": "^/dashboard/portfolio/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/dashboard/portfolio/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/dashboard/portfolio/[id]/achievements",
+      "regex": "^/dashboard/portfolio/([^/]+?)/achievements(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/dashboard/portfolio/(?<nxtPid>[^/]+?)/achievements(?:/)?$"
+    },
+    {
+      "page": "/dashboard/portfolio/[id]/education",
+      "regex": "^/dashboard/portfolio/([^/]+?)/education(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/dashboard/portfolio/(?<nxtPid>[^/]+?)/education(?:/)?$"
+    },
+    {
+      "page": "/dashboard/portfolio/[id]/experience",
+      "regex": "^/dashboard/portfolio/([^/]+?)/experience(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/dashboard/portfolio/(?<nxtPid>[^/]+?)/experience(?:/)?$"
+    },
+    {
+      "page": "/dashboard/portfolio/[id]/profile",
+      "regex": "^/dashboard/portfolio/([^/]+?)/profile(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/dashboard/portfolio/(?<nxtPid>[^/]+?)/profile(?:/)?$"
+    },
+    {
+      "page": "/dashboard/portfolio/[id]/projects",
+      "regex": "^/dashboard/portfolio/([^/]+?)/projects(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/dashboard/portfolio/(?<nxtPid>[^/]+?)/projects(?:/)?$"
+    },
+    {
+      "page": "/dashboard/portfolio/[id]/research",
+      "regex": "^/dashboard/portfolio/([^/]+?)/research(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/dashboard/portfolio/(?<nxtPid>[^/]+?)/research(?:/)?$"
+    },
+    {
+      "page": "/dashboard/portfolio/[id]/skills",
+      "regex": "^/dashboard/portfolio/([^/]+?)/skills(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/dashboard/portfolio/(?<nxtPid>[^/]+?)/skills(?:/)?$"
+    },
+    {
+      "page": "/dashboard/portfolio/[id]/socials",
+      "regex": "^/dashboard/portfolio/([^/]+?)/socials(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/dashboard/portfolio/(?<nxtPid>[^/]+?)/socials(?:/)?$"
+    },
+    {
+      "page": "/dashboard/portfolio/[id]/template",
+      "regex": "^/dashboard/portfolio/([^/]+?)/template(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/dashboard/portfolio/(?<nxtPid>[^/]+?)/template(?:/)?$"
+    },
+    {
+      "page": "/u/[username]",
+      "regex": "^/u/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPusername": "nxtPusername"
+      },
+      "namedRegex": "^/u/(?<nxtPusername>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/auth/callback",
+      "regex": "^/auth/callback(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth/callback(?:/)?$"
+    },
+    {
+      "page": "/dashboard",
+      "regex": "^/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard(?:/)?$"
+    },
+    {
+      "page": "/dashboard/account",
+      "regex": "^/dashboard/account(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/account(?:/)?$"
+    },
+    {
+      "page": "/dashboard/portfolio/new",
+      "regex": "^/dashboard/portfolio/new(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/portfolio/new(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "RSC",
+    "varyHeader": "RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch",
+    "prefetchHeader": "Next-Router-Prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "Next-Router-Segment-Prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  },
+  "rewrites": []
+}

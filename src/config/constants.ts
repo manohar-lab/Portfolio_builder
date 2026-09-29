@@ -1,0 +1,52 @@
+import { SectionConfig } from "../types/portfolio";
+
+export const RESERVED_SLUGS = new Set([
+  "admin",
+  "api",
+  "app",
+  "auth",
+  "dashboard",
+  "editor",
+  "help",
+  "login",
+  "logout",
+  "privacy",
+  "profile",
+  "register",
+  "settings",
+  "signup",
+  "status",
+  "support",
+  "terms",
+  "u",
+  "user",
+  "users",
+  "www",
+]);
+
+export const DEFAULT_PORTFOLIO_SECTIONS: SectionConfig[] = [
+  { id: "sec-hero", type: "hero", title: "Hero Header", isVisible: true, order: 0 },
+  { id: "sec-about", type: "about", title: "About Me", isVisible: true, order: 1 },
+  { id: "sec-skills", type: "skills", title: "Skills & Expertise", isVisible: true, order: 2 },
+  { id: "sec-projects", type: "projects", title: "Featured Projects", isVisible: true, order: 3 },
+  { id: "sec-education", type: "education", title: "Education", isVisible: true, order: 4 },
+  { id: "sec-academic", type: "academic_journey", title: "Academic Journey", isVisible: false, order: 5 },
+  { id: "sec-experience", type: "experience", title: "Experience", isVisible: true, order: 6 },
+  { id: "sec-research", type: "research", title: "Research & Publications", isVisible: false, order: 7 },
+  { id: "sec-achievements", type: "achievements", title: "Achievements", isVisible: false, order: 8 },
+  { id: "sec-certifications", type: "certifications", title: "Certifications", isVisible: false, order: 9 },
+  { id: "sec-publications", type: "publications", title: "Publications", isVisible: false, order: 10 },
+  { id: "sec-services", type: "services", title: "Services", isVisible: false, order: 11 },
+  { id: "sec-contact", type: "contact", title: "Contact", isVisible: true, order: 12 },
+  { id: "sec-socials", type: "social_links", title: "Social Profiles", isVisible: true, order: 13 },
+];
+
+export const PRIMARY_COLOR_PALETTE = [
+  { name: "Blue", hex: "#3b82f6" },
+  { name: "Indigo", hex: "#6366f1" },
+  { name: "Purple", hex: "#8b5cf6" },
+  { name: "Emerald", hex: "#10b981" },
+  { name: "Rose", hex: "#f43f5e" },
+  { name: "Amber", hex: "#f59e0b" },
+  { name: "Slate", hex: "#475569" },
+];

@@ -1,0 +1,21 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/auth/callback/route": "/auth/callback",
+  "/api/health/route": "/api/health",
+  "/login/page": "/login",
+  "/page": "/",
+  "/u/[username]/page": "/u/[username]",
+  "/dashboard/page": "/dashboard",
+  "/dashboard/portfolio/[id]/education/page": "/dashboard/portfolio/[id]/education",
+  "/dashboard/portfolio/[id]/achievements/page": "/dashboard/portfolio/[id]/achievements",
+  "/dashboard/portfolio/[id]/profile/page": "/dashboard/portfolio/[id]/profile",
+  "/dashboard/portfolio/[id]/experience/page": "/dashboard/portfolio/[id]/experience",
+  "/dashboard/portfolio/[id]/projects/page": "/dashboard/portfolio/[id]/projects",
+  "/dashboard/portfolio/[id]/socials/page": "/dashboard/portfolio/[id]/socials",
+  "/dashboard/portfolio/[id]/template/page": "/dashboard/portfolio/[id]/template",
+  "/dashboard/portfolio/[id]/research/page": "/dashboard/portfolio/[id]/research",
+  "/dashboard/portfolio/[id]/page": "/dashboard/portfolio/[id]",
+  "/dashboard/portfolio/new/page": "/dashboard/portfolio/new",
+  "/dashboard/account/page": "/dashboard/account",
+  "/dashboard/portfolio/[id]/skills/page": "/dashboard/portfolio/[id]/skills"
+}

@@ -1,0 +1,21 @@
+import { PortfolioData } from "./portfolio";
+
+/**
+ * Portfolio Template Registry & Component Interface
+ */
+
+export interface TemplateMetadata {
+  id: string;
+  name: string;
+  description: string;
+  category: "minimal" | "developer" | "research" | "creative" | "student" | "ai_tech";
+  thumbnailUrl: string;
+  isAvailable: boolean;
+}
+
+export interface TemplateProps {
+  data: PortfolioData;
+  isPreview?: boolean;
+}
+
+export type TemplateComponent = React.ComponentType<TemplateProps>;
