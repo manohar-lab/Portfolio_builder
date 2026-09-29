@@ -3,12 +3,14 @@
 import React, { useState } from "react";
 import { useEditor } from "@/editor/EditorContext";
 import { ProjectItem, ProjectStatus } from "@/types/portfolio";
-import { Plus, Trash2, Edit3, ArrowUp, ArrowDown, Star } from "lucide-react";
+import { GitHubImportModal } from "@/dashboard/GitHubImportModal";
+import { Plus, Trash2, Edit3, ArrowUp, ArrowDown, Star, Github } from "lucide-react";
 
 export const ProjectsPanel: React.FC = () => {
   const { portfolio, updatePortfolio } = useEditor();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   // Form State
@@ -89,6 +91,9 @@ export const ProjectsPanel: React.FC = () => {
       isCurrent: formData.isCurrent || false,
       isFeatured: formData.isFeatured || false,
       sortOrder: formData.sortOrder || portfolio.projects.length,
+      source: formData.source || "MANUAL",
+      githubRepositoryId: formData.githubRepositoryId,
+      githubFullName: formData.githubFullName,
     };
 
     updatePortfolio((prev) => {
@@ -130,23 +135,35 @@ export const ProjectsPanel: React.FC = () => {
     }));
   };
 
+  const existingProjectGithubUrls = portfolio.projects
+    .map((p) => p.githubUrl || p.githubRepositoryId)
+    .filter(Boolean) as string[];
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between border-b pb-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b pb-4">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Projects Manager</h2>
-          <p className="text-sm text-gray-500">Add, reorder, and feature key projects in your portfolio.</p>
+          <p className="text-sm text-gray-500">Add manually or import projects directly from your GitHub repositories.</p>
         </div>
         {!showAddForm && (
-          <button
-            onClick={() => {
-              resetForm();
-              setShowAddForm(true);
-            }}
-            className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition"
-          >
-            <Plus className="h-4 w-4" /> Add Project
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowImportModal(true)}
+              className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-semibold text-gray-800 hover:bg-gray-50 transition shadow-sm"
+            >
+              <Github className="h-4 w-4" /> Import from GitHub
+            </button>
+            <button
+              onClick={() => {
+                resetForm();
+                setShowAddForm(true);
+              }}
+              className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-indigo-700 transition shadow-sm"
+            >
+              <Plus className="h-4 w-4" /> Add Project
+            </button>
+          </div>
         )}
       </div>
 
@@ -305,14 +322,22 @@ export const ProjectsPanel: React.FC = () => {
 
       {/* Projects List */}
       {portfolio.projects.length === 0 && !showAddForm ? (
-        <div className="rounded-xl border border-dashed border-gray-300 p-8 text-center">
+        <div className="rounded-xl border border-dashed border-gray-300 p-8 text-center space-y-3">
           <p className="text-sm text-gray-500">No projects added yet.</p>
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 px-3.5 py-2 text-xs font-semibold text-indigo-600 hover:bg-indigo-100 transition"
-          >
-            <Plus className="h-4 w-4" /> Add your first project
-          </button>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <button
+              onClick={() => setShowImportModal(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-semibold text-gray-800 hover:bg-gray-50 transition"
+            >
+              <Github className="h-4 w-4" /> Import from GitHub
+            </button>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 px-3.5 py-2 text-xs font-semibold text-indigo-600 hover:bg-indigo-100 transition"
+            >
+              <Plus className="h-4 w-4" /> Add your first project
+            </button>
+          </div>
         </div>
       ) : (
         <div className="space-y-3">
@@ -324,6 +349,11 @@ export const ProjectsPanel: React.FC = () => {
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
                   <h4 className="font-semibold text-gray-900">{project.title}</h4>
+                  {project.source === "GITHUB" && (
+                    <span className="inline-flex items-center gap-1 rounded bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-700">
+                      <Github className="h-3 w-3 text-gray-700" /> GitHub Import
+                    </span>
+                  )}
                   {project.isFeatured && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
                       <Star className="h-3 w-3 fill-amber-500" /> Featured
@@ -425,6 +455,14 @@ export const ProjectsPanel: React.FC = () => {
           ))}
         </div>
       )}
+
+      {/* GitHub Import Modal */}
+      <GitHubImportModal
+        portfolioId={portfolio.id}
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        existingProjectGithubUrls={existingProjectGithubUrls}
+      />
     </div>
   );
 };

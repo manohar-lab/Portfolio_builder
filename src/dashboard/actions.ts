@@ -26,6 +26,12 @@ import {
   saveSocialLink,
   deleteSocialLink,
 } from "@/database/section-services";
+import {
+  getGitHubConnectionStatus,
+  fetchUserRepositories,
+  importGitHubRepositories,
+  disconnectGitHubAccount,
+} from "@/services/github";
 import { CreatePortfolioSchema } from "@/validation/portfolio.schema";
 import {
   PortfolioData,
@@ -38,6 +44,7 @@ import {
   CertificationItem,
   SocialLink,
   UserProfile,
+  GitHubRepo,
 } from "@/types/portfolio";
 
 export async function checkSlugAvailabilityAction(slug: string, excludePortfolioId?: string) {
@@ -255,4 +262,30 @@ export async function deleteSocialLinkAction(portfolioId: string, linkId: string
     revalidatePath(`/dashboard/portfolio/${portfolioId}`);
   }
   return result;
+}
+
+/* =========================================================
+ * GITHUB INTEGRATION ACTIONS (PHASE 6)
+ * ========================================================= */
+export async function getGitHubStatusAction() {
+  return await getGitHubConnectionStatus();
+}
+
+export async function fetchUserRepositoriesAction(params?: {
+  search?: string;
+  language?: string;
+  sort?: "updated" | "stars" | "name";
+}) {
+  return await fetchUserRepositories(params);
+}
+
+export async function importGitHubRepositoriesAction(
+  portfolioId: string,
+  reposToImport: GitHubRepo[]
+) {
+  return await importGitHubRepositories(portfolioId, reposToImport);
+}
+
+export async function disconnectGitHubAction() {
+  return await disconnectGitHubAccount();
 }

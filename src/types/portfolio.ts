@@ -86,6 +86,34 @@ export interface ProjectItem {
   isCurrent: boolean;
   isFeatured: boolean;
   sortOrder?: number;
+  source?: "MANUAL" | "GITHUB";
+  githubRepositoryId?: string;
+  githubFullName?: string;
+  githubLastSyncedAt?: string;
+}
+
+export interface GitHubRepo {
+  id: number;
+  name: string;
+  fullName: string;
+  description: string | null;
+  language: string | null;
+  topics: string[];
+  stargazersCount: number;
+  forksCount: number;
+  updatedAt: string;
+  htmlUrl: string;
+  homepage: string | null;
+  isPrivate: boolean;
+  owner: string;
+  isAlreadyImported?: boolean;
+}
+
+export interface GitHubConnectionStatus {
+  isConnected: boolean;
+  username?: string;
+  avatarUrl?: string;
+  error?: string;
 }
 
 export interface EducationItem {

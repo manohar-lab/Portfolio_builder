@@ -7,13 +7,6 @@
       "static/chunks/main-app-fe6218e971222054.js",
       "static/chunks/app/_not-found/page-31acb197baf9f6aa.js"
     ],
-    "/api/health/route": [
-      "static/chunks/webpack-c5434b85dc86353a.js",
-      "static/chunks/4bd1b696-72a8cd297089b898.js",
-      "static/chunks/684-1879c21f69073269.js",
-      "static/chunks/main-app-fe6218e971222054.js",
-      "static/chunks/app/api/health/route-e33804d82a311324.js"
-    ],
     "/auth/callback/route": [
       "static/chunks/webpack-c5434b85dc86353a.js",
       "static/chunks/4bd1b696-72a8cd297089b898.js",
@@ -21,12 +14,19 @@
       "static/chunks/main-app-fe6218e971222054.js",
       "static/chunks/app/auth/callback/route-ceadce224432a0d3.js"
     ],
+    "/api/health/route": [
+      "static/chunks/webpack-c5434b85dc86353a.js",
+      "static/chunks/4bd1b696-72a8cd297089b898.js",
+      "static/chunks/684-1879c21f69073269.js",
+      "static/chunks/main-app-fe6218e971222054.js",
+      "static/chunks/app/api/health/route-e33804d82a311324.js"
+    ],
     "/layout": [
       "static/chunks/webpack-c5434b85dc86353a.js",
       "static/chunks/4bd1b696-72a8cd297089b898.js",
       "static/chunks/684-1879c21f69073269.js",
       "static/chunks/main-app-fe6218e971222054.js",
-      "static/css/f5c203cfa9e9828c.css",
+      "static/css/80c662470e1f3e8a.css",
       "static/chunks/app/layout-876bf4cda96eea64.js"
     ],
     "/login/page": [
@@ -35,7 +35,7 @@
       "static/chunks/684-1879c21f69073269.js",
       "static/chunks/main-app-fe6218e971222054.js",
       "static/chunks/874-5a43dd470b19eb9d.js",
-      "static/chunks/app/login/page-633f8b5a7a5c6ac5.js"
+      "static/chunks/app/login/page-6ad807507cf456ac.js"
     ],
     "/u/[username]/not-found": [
       "static/chunks/webpack-c5434b85dc86353a.js",
@@ -68,14 +68,6 @@
       "static/chunks/874-5a43dd470b19eb9d.js",
       "static/chunks/app/dashboard/layout-d8ab5a32206721a6.js"
     ],
-    "/dashboard/page": [
-      "static/chunks/webpack-c5434b85dc86353a.js",
-      "static/chunks/4bd1b696-72a8cd297089b898.js",
-      "static/chunks/684-1879c21f69073269.js",
-      "static/chunks/main-app-fe6218e971222054.js",
-      "static/chunks/874-5a43dd470b19eb9d.js",
-      "static/chunks/app/dashboard/page-2aaeb2b372dc72cf.js"
-    ],
     "/dashboard/account/page": [
       "static/chunks/webpack-c5434b85dc86353a.js",
       "static/chunks/4bd1b696-72a8cd297089b898.js",
@@ -84,23 +76,25 @@
       "static/chunks/874-5a43dd470b19eb9d.js",
       "static/chunks/app/dashboard/account/page-9115e34ca77c92e9.js"
     ],
+    "/dashboard/page": [
+      "static/chunks/webpack-c5434b85dc86353a.js",
+      "static/chunks/4bd1b696-72a8cd297089b898.js",
+      "static/chunks/684-1879c21f69073269.js",
+      "static/chunks/main-app-fe6218e971222054.js",
+      "static/chunks/874-5a43dd470b19eb9d.js",
+      "static/chunks/725-319b2e9ee43afc51.js",
+      "static/chunks/app/dashboard/page-65faf314ecb29e0e.js"
+    ],
     "/dashboard/portfolio/[id]/editor/page": [
       "static/chunks/webpack-c5434b85dc86353a.js",
       "static/chunks/4bd1b696-72a8cd297089b898.js",
       "static/chunks/684-1879c21f69073269.js",
       "static/chunks/main-app-fe6218e971222054.js",
       "static/chunks/874-5a43dd470b19eb9d.js",
-      "static/chunks/607-60bc979d6c72526f.js",
+      "static/chunks/46-7396f2e937d4a183.js",
       "static/chunks/827-78e6d67f5b025e4e.js",
-      "static/chunks/app/dashboard/portfolio/[id]/editor/page-1130d20b021da656.js"
-    ],
-    "/dashboard/portfolio/[id]/experience/page": [
-      "static/chunks/webpack-c5434b85dc86353a.js",
-      "static/chunks/4bd1b696-72a8cd297089b898.js",
-      "static/chunks/684-1879c21f69073269.js",
-      "static/chunks/main-app-fe6218e971222054.js",
-      "static/chunks/874-5a43dd470b19eb9d.js",
-      "static/chunks/app/dashboard/portfolio/[id]/experience/page-72850f5e794a5259.js"
+      "static/chunks/725-319b2e9ee43afc51.js",
+      "static/chunks/app/dashboard/portfolio/[id]/editor/page-ce885c4120bf23f8.js"
     ],
     "/dashboard/portfolio/[id]/achievements/page": [
       "static/chunks/webpack-c5434b85dc86353a.js",
@@ -110,13 +104,13 @@
       "static/chunks/874-5a43dd470b19eb9d.js",
       "static/chunks/app/dashboard/portfolio/[id]/achievements/page-dd0a38c7246a5414.js"
     ],
-    "/dashboard/portfolio/[id]/education/page": [
+    "/dashboard/portfolio/[id]/experience/page": [
       "static/chunks/webpack-c5434b85dc86353a.js",
       "static/chunks/4bd1b696-72a8cd297089b898.js",
       "static/chunks/684-1879c21f69073269.js",
       "static/chunks/main-app-fe6218e971222054.js",
       "static/chunks/874-5a43dd470b19eb9d.js",
-      "static/chunks/app/dashboard/portfolio/[id]/education/page-83268d4c1da16836.js"
+      "static/chunks/app/dashboard/portfolio/[id]/experience/page-72850f5e794a5259.js"
     ],
     "/dashboard/portfolio/[id]/page": [
       "static/chunks/webpack-c5434b85dc86353a.js",
@@ -133,22 +127,6 @@
       "static/chunks/main-app-fe6218e971222054.js",
       "static/chunks/874-5a43dd470b19eb9d.js",
       "static/chunks/app/dashboard/portfolio/[id]/profile/page-a99b53ad2d89f3a3.js"
-    ],
-    "/dashboard/portfolio/[id]/socials/page": [
-      "static/chunks/webpack-c5434b85dc86353a.js",
-      "static/chunks/4bd1b696-72a8cd297089b898.js",
-      "static/chunks/684-1879c21f69073269.js",
-      "static/chunks/main-app-fe6218e971222054.js",
-      "static/chunks/874-5a43dd470b19eb9d.js",
-      "static/chunks/app/dashboard/portfolio/[id]/socials/page-bfdfc012cacdd656.js"
-    ],
-    "/dashboard/portfolio/[id]/skills/page": [
-      "static/chunks/webpack-c5434b85dc86353a.js",
-      "static/chunks/4bd1b696-72a8cd297089b898.js",
-      "static/chunks/684-1879c21f69073269.js",
-      "static/chunks/main-app-fe6218e971222054.js",
-      "static/chunks/874-5a43dd470b19eb9d.js",
-      "static/chunks/app/dashboard/portfolio/[id]/skills/page-e6a77eeed5e06ecc.js"
     ],
     "/dashboard/portfolio/[id]/projects/page": [
       "static/chunks/webpack-c5434b85dc86353a.js",
@@ -167,13 +145,21 @@
       "static/chunks/827-78e6d67f5b025e4e.js",
       "static/chunks/app/dashboard/portfolio/[id]/template/page-b839d4ce4db807bc.js"
     ],
-    "/dashboard/portfolio/[id]/research/page": [
+    "/dashboard/portfolio/[id]/socials/page": [
       "static/chunks/webpack-c5434b85dc86353a.js",
       "static/chunks/4bd1b696-72a8cd297089b898.js",
       "static/chunks/684-1879c21f69073269.js",
       "static/chunks/main-app-fe6218e971222054.js",
       "static/chunks/874-5a43dd470b19eb9d.js",
-      "static/chunks/app/dashboard/portfolio/[id]/research/page-cd1338f0dc711c7c.js"
+      "static/chunks/app/dashboard/portfolio/[id]/socials/page-bfdfc012cacdd656.js"
+    ],
+    "/dashboard/portfolio/[id]/education/page": [
+      "static/chunks/webpack-c5434b85dc86353a.js",
+      "static/chunks/4bd1b696-72a8cd297089b898.js",
+      "static/chunks/684-1879c21f69073269.js",
+      "static/chunks/main-app-fe6218e971222054.js",
+      "static/chunks/874-5a43dd470b19eb9d.js",
+      "static/chunks/app/dashboard/portfolio/[id]/education/page-83268d4c1da16836.js"
     ],
     "/dashboard/portfolio/new/page": [
       "static/chunks/webpack-c5434b85dc86353a.js",
@@ -182,6 +168,22 @@
       "static/chunks/main-app-fe6218e971222054.js",
       "static/chunks/874-5a43dd470b19eb9d.js",
       "static/chunks/app/dashboard/portfolio/new/page-c65991f2237ece7b.js"
+    ],
+    "/dashboard/portfolio/[id]/research/page": [
+      "static/chunks/webpack-c5434b85dc86353a.js",
+      "static/chunks/4bd1b696-72a8cd297089b898.js",
+      "static/chunks/684-1879c21f69073269.js",
+      "static/chunks/main-app-fe6218e971222054.js",
+      "static/chunks/874-5a43dd470b19eb9d.js",
+      "static/chunks/app/dashboard/portfolio/[id]/research/page-cd1338f0dc711c7c.js"
+    ],
+    "/dashboard/portfolio/[id]/skills/page": [
+      "static/chunks/webpack-c5434b85dc86353a.js",
+      "static/chunks/4bd1b696-72a8cd297089b898.js",
+      "static/chunks/684-1879c21f69073269.js",
+      "static/chunks/main-app-fe6218e971222054.js",
+      "static/chunks/874-5a43dd470b19eb9d.js",
+      "static/chunks/app/dashboard/portfolio/[id]/skills/page-e6a77eeed5e06ecc.js"
     ]
   }
 }
