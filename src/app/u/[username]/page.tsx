@@ -16,6 +16,7 @@ export async function generateMetadata({ params }: PublicPortfolioPageProps): Pr
     return {
       title: "Page Not Found",
       description: "The requested page does not exist.",
+      robots: { index: false, follow: false },
     };
   }
 
@@ -25,29 +26,48 @@ export async function generateMetadata({ params }: PublicPortfolioPageProps): Pr
     return {
       title: "Portfolio Not Found | PortfolioCraft",
       description: "The requested portfolio is unavailable or private.",
+      robots: { index: false, follow: false },
     };
   }
 
   const fullName = portfolio.profile.fullName || portfolio.title || username;
   const headline = portfolio.profile.headline || "Professional Portfolio";
   const bio = portfolio.profile.bio || `Explore ${fullName}'s portfolio, projects, skills, and background.`;
-  const avatar = portfolio.profile.avatarUrl;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const canonicalUrl = `${appUrl.replace(/\/$/, "")}/u/${encodeURIComponent(username)}`;
+  const ogImageUrl = `${appUrl.replace(/\/$/, "")}/api/og/${encodeURIComponent(username)}`;
 
   return {
+    metadataBase: new URL(appUrl),
     title: `${fullName} | ${headline}`,
     description: bio.slice(0, 160),
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
     openGraph: {
       title: `${fullName} — ${headline}`,
       description: bio.slice(0, 200),
+      url: canonicalUrl,
       type: "website",
       siteName: "PortfolioCraft Platform",
-      images: avatar ? [{ url: avatar, alt: `${fullName} Profile Picture` }] : [],
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${fullName}'s Public Portfolio Social Preview`,
+        },
+      ],
     },
     twitter: {
-      card: avatar ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title: `${fullName} — ${headline}`,
       description: bio.slice(0, 200),
-      images: avatar ? [avatar] : [],
+      images: [ogImageUrl],
     },
   };
 }

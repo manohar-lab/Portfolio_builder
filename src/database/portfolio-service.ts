@@ -560,3 +560,36 @@ export async function getPublicPortfolioBySlug(slug: string): Promise<PortfolioD
     })),
   });
 }
+
+/**
+ * Updates public username/slug for an owned portfolio with availability validation.
+ */
+export async function updatePortfolioSlug(
+  portfolioId: string,
+  newSlug: string
+): Promise<{ success: boolean; error?: string }> {
+  const user = await requireAuth();
+  const supabase = await createClient();
+  const internalUserId = user.internalUser?.id || user.authUser.id;
+
+  const availability = await checkSlugAvailability(newSlug, portfolioId);
+  if (!availability.available) {
+    return { success: false, error: availability.reason || "Slug is unavailable." };
+  }
+
+  const { error } = await supabase
+    .from("portfolios")
+    .update({
+      slug: newSlug.toLowerCase().trim(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", portfolioId)
+    .eq("user_id", internalUserId);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  return { success: true };
+}
+

@@ -15,6 +15,14 @@
   "headers": [],
   "dynamicRoutes": [
     {
+      "page": "/api/og/[slug]",
+      "regex": "^/api/og/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/api/og/(?<nxtPslug>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/dashboard/portfolio/[id]",
       "regex": "^/dashboard/portfolio/([^/]+?)(?:/)?$",
       "routeKeys": {

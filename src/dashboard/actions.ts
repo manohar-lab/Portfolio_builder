@@ -325,3 +325,19 @@ import { submitUserFeedback, SubmitFeedbackPayload } from "@/services/feedback-s
 export async function submitFeedbackAction(payload: SubmitFeedbackPayload) {
   return await submitUserFeedback(payload);
 }
+
+/* =========================================================
+ * SLUG & SHARING ACTIONS (PHASE 13)
+ * ========================================================= */
+import { updatePortfolioSlug } from "@/database/portfolio-service";
+
+export async function updatePortfolioSlugAction(portfolioId: string, newSlug: string) {
+  const result = await updatePortfolioSlug(portfolioId, newSlug);
+  if (result.success) {
+    revalidatePath("/dashboard");
+    revalidatePath(`/dashboard/portfolio/${portfolioId}`);
+    revalidatePath(`/u/${newSlug}`);
+  }
+  return result;
+}
+
