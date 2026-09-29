@@ -8,6 +8,12 @@ export async function middleware(request: NextRequest) {
     },
   });
 
+  // Apply baseline security headers to all responses
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder-project.supabase.co";
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-anon-key";
 
@@ -39,7 +45,12 @@ export async function middleware(request: NextRequest) {
 
   // Protected route check
   const isProtectedRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/account");
-  const isAuthPage = pathname === "/login";
+  const isPrivatePage = isProtectedRoute || pathname === "/login" || pathname === "/onboarding";
+
+  // Prevent search engine indexing of private/dashboard routes
+  if (isPrivatePage) {
+    response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  }
 
   if (isProtectedRoute && !user) {
     url.pathname = "/login";
@@ -47,7 +58,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (isAuthPage && user) {
+  if (pathname === "/login" && user) {
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }

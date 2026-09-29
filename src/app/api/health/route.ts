@@ -1,11 +1,17 @@
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  return NextResponse.json({
-    status: "ok",
-    service: "portfolio-builder-saas",
-    version: "0.1.0",
-    phase: "Phase 0 - Architecture & Baseline",
-    timestamp: new Date().toISOString(),
-  });
+  return NextResponse.json(
+    {
+      status: "ok",
+      service: "PortfolioCraft SaaS",
+      timestamp: new Date().toISOString(),
+    },
+    {
+      status: 200,
+      headers: {
+        "Cache-Control": "no-store, max-age=0",
+      },
+    }
+  );
 }
