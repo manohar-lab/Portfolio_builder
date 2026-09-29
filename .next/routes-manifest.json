@@ -149,10 +149,22 @@
       "namedRegex": "^/dashboard/portfolio/new(?:/)?$"
     },
     {
+      "page": "/dashboard/templates",
+      "regex": "^/dashboard/templates(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/templates(?:/)?$"
+    },
+    {
       "page": "/login",
       "regex": "^/login(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/onboarding",
+      "regex": "^/onboarding(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/onboarding(?:/)?$"
     }
   ],
   "dataRoutes": [],

@@ -8,6 +8,9 @@ export const AVAILABLE_TEMPLATES: TemplateMetadata[] = [
     category: "minimal",
     thumbnailUrl: "/templates/minimal-preview.png",
     isAvailable: true,
+    tags: ["minimal", "clean", "typography", "professional"],
+    bestFor: ["freelancers", "general professionals", "designers", "writers"],
+    supportedSections: ["hero", "about", "projects", "skills", "experience", "education", "contact", "social_links"],
   },
   {
     id: "developer",
@@ -16,6 +19,9 @@ export const AVAILABLE_TEMPLATES: TemplateMetadata[] = [
     category: "developer",
     thumbnailUrl: "/templates/developer-preview.png",
     isAvailable: true,
+    tags: ["developer", "technical", "projects", "github", "code"],
+    bestFor: ["software engineers", "full-stack developers", "open-source builders", "technical students"],
+    supportedSections: ["hero", "about", "skills", "projects", "experience", "education", "achievements", "certifications", "contact", "social_links"],
   },
   {
     id: "research",
@@ -24,6 +30,9 @@ export const AVAILABLE_TEMPLATES: TemplateMetadata[] = [
     category: "research",
     thumbnailUrl: "/templates/research-preview.png",
     isAvailable: true,
+    tags: ["research", "academic", "papers", "publications", "datasets"],
+    bestFor: ["researchers", "PhD candidates", "data scientists", "academic professors"],
+    supportedSections: ["hero", "about", "research", "projects", "skills", "academic_journey", "education", "achievements", "social_links"],
   },
   {
     id: "creative",
@@ -32,6 +41,8 @@ export const AVAILABLE_TEMPLATES: TemplateMetadata[] = [
     category: "creative",
     thumbnailUrl: "/templates/creative-preview.png",
     isAvailable: false,
+    tags: ["creative", "visual", "portfolio", "media"],
+    bestFor: ["UI/UX designers", "visual artists", "content creators"],
   },
   {
     id: "student",
@@ -40,6 +51,8 @@ export const AVAILABLE_TEMPLATES: TemplateMetadata[] = [
     category: "student",
     thumbnailUrl: "/templates/student-preview.png",
     isAvailable: false,
+    tags: ["student", "academic", "coursework", "grades"],
+    bestFor: ["university students", "graduates", "internship seekers"],
   },
   {
     id: "ai_tech",
@@ -48,5 +61,7 @@ export const AVAILABLE_TEMPLATES: TemplateMetadata[] = [
     category: "ai_tech",
     thumbnailUrl: "/templates/aitech-preview.png",
     isAvailable: false,
+    tags: ["ai", "machine-learning", "futuristic", "dark-mode"],
+    bestFor: ["AI/ML engineers", "data scientists", "robotics researchers"],
   },
 ];

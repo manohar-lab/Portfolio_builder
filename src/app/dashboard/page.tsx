@@ -1,14 +1,31 @@
 import React from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requireAuth } from "@/auth/service";
 import { getUserPortfolios } from "@/database/portfolio-service";
+import { getUserOnboardingStatus } from "@/services/onboarding-service";
 import { PortfolioCardActions } from "@/dashboard/PortfolioCardActions";
 import { GitHubIntegrationCard } from "@/dashboard/GitHubIntegrationCard";
-import { PlusCircle, Layers, Sparkles, CheckCircle2, Clock } from "lucide-react";
+import {
+  PlusCircle,
+  Layers,
+  Sparkles,
+  CheckCircle2,
+  Clock,
+  LayoutTemplate,
+  ArrowRight,
+  TrendingUp,
+} from "lucide-react";
 
 export default async function DashboardOverviewPage() {
   const userData = await requireAuth("/dashboard");
+  const onboardingStatus = await getUserOnboardingStatus();
   const portfolios = await getUserPortfolios();
+
+  // FIRST-TIME USER REDIRECT: If no portfolio exists and onboarding incomplete, redirect to /onboarding
+  if (portfolios.length === 0 && !onboardingStatus.onboardingCompleted) {
+    redirect("/onboarding");
+  }
 
   const displayName =
     userData.profile?.full_name ||
@@ -19,7 +36,24 @@ export default async function DashboardOverviewPage() {
 
   return (
     <div className="space-y-8">
-      
+      {/* CONTINUE ONBOARDING BANNER IF INCOMPLETE */}
+      {!onboardingStatus.onboardingCompleted && (
+        <div className="p-4 bg-gradient-to-r from-amber-950/60 to-slate-900 border border-amber-500/30 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="space-y-0.5">
+            <h3 className="text-sm font-bold text-amber-300">Continue building your portfolio?</h3>
+            <p className="text-xs text-amber-200/70">
+              You left onboarding at Step {onboardingStatus.onboardingStep}. Finish setup to configure template & sections.
+            </p>
+          </div>
+          <Link
+            href="/onboarding"
+            className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shrink-0"
+          >
+            Resume Onboarding <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+      )}
+
       {/* WELCOME BANNER & ACTION HEADER */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-8 bg-gradient-to-r from-indigo-950/50 via-slate-900 to-slate-900 border border-slate-800 rounded-3xl">
         <div className="space-y-2">
@@ -30,25 +64,33 @@ export default async function DashboardOverviewPage() {
             Welcome back, {displayName}
           </h1>
           <p className="text-sm text-slate-400">
-            Create, edit, customize, and publish your professional portfolio websites.
+            Manage your portfolios, switch visual templates, import GitHub projects, and publish updates.
           </p>
         </div>
 
-        <Link
-          href="/dashboard/portfolio/new"
-          className="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2 shrink-0"
-        >
-          <PlusCircle className="w-4 h-4" /> Create New Portfolio
-        </Link>
+        <div className="flex items-center gap-3 shrink-0">
+          <Link
+            href="/dashboard/templates"
+            className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs transition border border-slate-700 flex items-center gap-2"
+          >
+            <LayoutTemplate className="w-4 h-4 text-indigo-400" /> Template Gallery
+          </Link>
+
+          <Link
+            href="/dashboard/portfolio/new"
+            className="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2"
+          >
+            <PlusCircle className="w-4 h-4" /> Create New Portfolio
+          </Link>
+        </div>
       </div>
 
-      {/* GITHUB INTEGRATION AREA */}
+      {/* GITHUB INTEGRATION & PORTFOLIOS CATALOG */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1">
+        <div className="md:col-span-1 space-y-6">
           <GitHubIntegrationCard defaultPortfolioId={firstPortfolioId} />
         </div>
 
-        {/* PORTFOLIOS CATALOG */}
         <div className="md:col-span-2 space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
@@ -61,9 +103,9 @@ export default async function DashboardOverviewPage() {
               {portfolios.map((portfolio) => (
                 <div
                   key={portfolio.id}
-                  className="p-6 bg-slate-900/90 border border-slate-800 rounded-2xl space-y-4 hover:border-slate-700 transition-all flex flex-col justify-between"
+                  className="p-6 bg-slate-900/90 border border-slate-800 rounded-2xl space-y-5 hover:border-slate-700 transition-all flex flex-col justify-between"
                 >
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <div className="flex justify-between items-start gap-2">
                       <div>
                         <h3 className="text-xl font-bold text-white">{portfolio.title}</h3>
@@ -81,13 +123,30 @@ export default async function DashboardOverviewPage() {
                       )}
                     </div>
 
-                    <div className="flex flex-wrap gap-2 text-xs text-slate-400 pt-1">
-                      <span className="bg-slate-800/80 px-2.5 py-1 rounded text-slate-300 font-mono">
+                    {/* Metadata & Template indicator */}
+                    <div className="flex flex-wrap gap-2 text-xs text-slate-400">
+                      <span className="bg-slate-800/80 px-2.5 py-1 rounded text-slate-300 font-mono capitalize">
                         Template: {portfolio.templateId}
                       </span>
                       <span className="bg-slate-800/80 px-2.5 py-1 rounded text-slate-400">
                         Updated: {new Date(portfolio.updatedAt).toLocaleDateString()}
                       </span>
+                    </div>
+
+                    {/* Portfolio Readiness Progress Indicator */}
+                    <div className="p-3 bg-slate-950/80 border border-slate-800/80 rounded-xl space-y-1.5">
+                      <div className="flex justify-between items-center text-xs font-semibold">
+                        <span className="text-slate-300 flex items-center gap-1">
+                          <TrendingUp className="w-3.5 h-3.5 text-indigo-400" /> Portfolio Readiness Score
+                        </span>
+                        <span className="text-indigo-400 font-mono">80%</span>
+                      </div>
+                      <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full"
+                          style={{ width: "80%" }}
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -103,20 +162,19 @@ export default async function DashboardOverviewPage() {
               <div className="space-y-1">
                 <h3 className="text-lg font-bold text-white">No Portfolios Found</h3>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  Create your first portfolio to start adding projects, experience, education, skills, and research entries.
+                  Create your first portfolio or start onboarding to customize your design.
                 </p>
               </div>
               <Link
-                href="/dashboard/portfolio/new"
+                href="/onboarding"
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs transition-colors shadow-lg shadow-indigo-600/30"
               >
-                <PlusCircle className="w-4 h-4" /> Create First Portfolio
+                <Sparkles className="w-4 h-4" /> Start Onboarding
               </Link>
             </div>
           )}
         </div>
       </div>
-
     </div>
   );
 }

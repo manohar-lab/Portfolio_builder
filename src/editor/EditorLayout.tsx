@@ -45,21 +45,38 @@ import { AppearancePanel } from "./panels/AppearancePanel";
 import { TemplatePanel } from "./panels/TemplatePanel";
 import { SettingsPanel } from "./panels/SettingsPanel";
 
-const NAV_ITEMS = [
-  { id: "sections", label: "Sections Order", icon: Layers },
-  { id: "profile", label: "Profile", icon: User },
-  { id: "projects", label: "Projects", icon: FolderGit2 },
-  { id: "skills", label: "Skills", icon: Code2 },
-  { id: "education", label: "Education", icon: GraduationCap },
-  { id: "academic_journey", label: "Academic Journey", icon: BookOpen },
-  { id: "experience", label: "Experience", icon: Briefcase },
-  { id: "research", label: "Research", icon: FlaskConical },
-  { id: "achievements", label: "Achievements", icon: Award },
-  { id: "certifications", label: "Certifications", icon: ShieldCheck },
-  { id: "socials", label: "Social Links", icon: Globe },
-  { id: "appearance", label: "Appearance", icon: Palette },
-  { id: "template", label: "Template", icon: LayoutTemplate },
-  { id: "settings", label: "Settings", icon: Settings },
+import { calculatePortfolioReadiness } from "@/utilities/portfolio-readiness";
+
+const NAV_GROUPS = [
+  {
+    category: "CONTENT",
+    items: [
+      { id: "sections", label: "Sections Order", icon: Layers },
+      { id: "profile", label: "Profile", icon: User },
+      { id: "projects", label: "Projects", icon: FolderGit2 },
+      { id: "skills", label: "Skills", icon: Code2 },
+      { id: "education", label: "Education", icon: GraduationCap },
+      { id: "academic_journey", label: "Academic Journey", icon: BookOpen },
+      { id: "experience", label: "Experience", icon: Briefcase },
+      { id: "research", label: "Research", icon: FlaskConical },
+      { id: "achievements", label: "Achievements", icon: Award },
+      { id: "certifications", label: "Certifications", icon: ShieldCheck },
+      { id: "socials", label: "Social Links", icon: Globe },
+    ],
+  },
+  {
+    category: "DESIGN",
+    items: [
+      { id: "appearance", label: "Appearance", icon: Palette },
+      { id: "template", label: "Template", icon: LayoutTemplate },
+    ],
+  },
+  {
+    category: "PUBLISH",
+    items: [
+      { id: "settings", label: "Settings", icon: Settings },
+    ],
+  },
 ];
 
 export const EditorLayout: React.FC = () => {
@@ -153,6 +170,26 @@ export const EditorLayout: React.FC = () => {
           <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-600 uppercase">
             {portfolio.status}
           </span>
+
+          {/* Portfolio Readiness Badge */}
+          {(() => {
+            const readiness = calculatePortfolioReadiness(portfolio);
+            return (
+              <div
+                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-[11px] font-semibold"
+                title={`Portfolio Readiness: ${readiness.score}%\nCompleted: ${readiness.completedCount}/${readiness.totalCount} requirements`}
+              >
+                <span>Readiness:</span>
+                <span className="font-bold">{readiness.score}%</span>
+                <div className="w-12 h-1.5 bg-indigo-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-indigo-600 rounded-full"
+                    style={{ width: `${readiness.score}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Status indicator & Actions */}
@@ -233,29 +270,38 @@ export const EditorLayout: React.FC = () => {
           }`}
         >
           {/* Vertical Icon Navigation */}
-          <nav className="flex w-16 shrink-0 flex-col items-center border-r border-gray-100 bg-gray-50 py-3 gap-1 overflow-y-auto">
-            {NAV_ITEMS.map((item) => {
-              const Icon = item.icon;
-              const isActive = activePanel === item.id;
+          <nav className="flex w-16 shrink-0 flex-col items-center border-r border-gray-100 bg-gray-50 py-3 gap-3 overflow-y-auto">
+            {NAV_GROUPS.map((group, groupIdx) => (
+              <div key={group.category} className="w-full flex flex-col items-center gap-1">
+                {groupIdx > 0 && <span className="w-8 h-px bg-gray-200 my-1" />}
+                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">
+                  {group.category}
+                </span>
 
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActivePanel(item.id)}
-                  title={item.label}
-                  className={`group relative flex h-10 w-10 items-center justify-center rounded-xl transition ${
-                    isActive
-                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-200"
-                      : "text-gray-500 hover:bg-gray-200/60 hover:text-gray-900"
-                  }`}
-                >
-                  <Icon className="h-5 w-5" />
-                  <span className="absolute left-14 z-30 hidden rounded-md bg-gray-900 px-2 py-1 text-[11px] font-medium text-white shadow-md group-hover:block whitespace-nowrap">
-                    {item.label}
-                  </span>
-                </button>
-              );
-            })}
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activePanel === item.id;
+
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActivePanel(item.id)}
+                      title={item.label}
+                      className={`group relative flex h-10 w-10 items-center justify-center rounded-xl transition ${
+                        isActive
+                          ? "bg-indigo-600 text-white shadow-md shadow-indigo-200"
+                          : "text-gray-500 hover:bg-gray-200/60 hover:text-gray-900"
+                      }`}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span className="absolute left-14 z-30 hidden rounded-md bg-gray-900 px-2 py-1 text-[11px] font-medium text-white shadow-md group-hover:block whitespace-nowrap">
+                        {item.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
           </nav>
 
           {/* Active Control Panel Form */}

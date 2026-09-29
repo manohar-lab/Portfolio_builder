@@ -25,6 +25,9 @@ export interface DbProfile {
   phone: string | null;
   is_available_for_work: boolean;
   resume_url: string | null;
+  onboarding_completed?: boolean;
+  onboarding_step?: number;
+  profile_type?: string;
   created_at: string;
   updated_at: string;
 }

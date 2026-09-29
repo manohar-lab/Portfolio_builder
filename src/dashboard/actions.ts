@@ -289,3 +289,30 @@ export async function importGitHubRepositoriesAction(
 export async function disconnectGitHubAction() {
   return await disconnectGitHubAccount();
 }
+
+/* =========================================================
+ * ONBOARDING ACTIONS (PHASE 7)
+ * ========================================================= */
+import {
+  getUserOnboardingStatus,
+  saveOnboardingStep,
+  completeOnboarding,
+  CompleteOnboardingPayload,
+} from "@/services/onboarding-service";
+
+export async function getOnboardingStatusAction() {
+  return await getUserOnboardingStatus();
+}
+
+export async function saveOnboardingStepAction(step: number, profileType?: string) {
+  return await saveOnboardingStep(step, profileType);
+}
+
+export async function completeOnboardingAction(payload: CompleteOnboardingPayload) {
+  const res = await completeOnboarding(payload);
+  if (res.success) {
+    revalidatePath("/dashboard");
+    revalidatePath("/onboarding");
+  }
+  return res;
+}
