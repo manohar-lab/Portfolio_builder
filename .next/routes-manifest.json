@@ -151,6 +151,12 @@
       "namedRegex": "^/dashboard/account(?:/)?$"
     },
     {
+      "page": "/dashboard/import",
+      "regex": "^/dashboard/import(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/import(?:/)?$"
+    },
+    {
       "page": "/dashboard/portfolio/new",
       "regex": "^/dashboard/portfolio/new(?:/)?$",
       "routeKeys": {},

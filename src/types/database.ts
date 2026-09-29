@@ -149,3 +149,15 @@ export interface DbUserFeedback {
   contact_email?: string | null;
   created_at: string;
 }
+
+export interface DbImportHistory {
+  id: string;
+  user_id: string;
+  portfolio_id?: string | null;
+  source: "github" | "resume" | "manual";
+  status: "completed" | "cancelled" | "failed";
+  items_imported_count: number;
+  metadata?: Record<string, unknown>;
+  created_at: string;
+}
+

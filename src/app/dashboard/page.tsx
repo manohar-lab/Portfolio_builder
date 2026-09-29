@@ -78,6 +78,13 @@ export default async function DashboardOverviewPage() {
           <FeedbackTriggerButton />
 
           <Link
+            href="/dashboard/import"
+            className="px-4 py-3 bg-indigo-950/60 hover:bg-indigo-900/80 text-indigo-300 font-semibold rounded-xl text-xs transition border border-indigo-500/30 flex items-center gap-2"
+          >
+            <Sparkles className="w-4 h-4 text-indigo-400" /> Import Information
+          </Link>
+
+          <Link
             href="/dashboard/templates"
             className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs transition border border-slate-700 flex items-center gap-2"
           >
