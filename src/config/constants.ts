@@ -1,6 +1,7 @@
 import { SectionConfig } from "../types/portfolio";
 
 export const RESERVED_SLUGS = new Set([
+  "about",
   "admin",
   "api",
   "app",
@@ -10,6 +11,7 @@ export const RESERVED_SLUGS = new Set([
   "help",
   "login",
   "logout",
+  "pricing",
   "privacy",
   "profile",
   "register",

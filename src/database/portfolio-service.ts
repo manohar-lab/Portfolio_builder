@@ -1,7 +1,7 @@
 import { createClient } from "@/auth/server";
 import { requireAuth } from "@/auth/service";
 import { PortfolioMeta, PortfolioData, SectionType, SkillItem, ResearchItem } from "@/types/portfolio";
-import { isValidSlug } from "@/utilities/slug";
+import { isValidSlug, isReservedSlug } from "@/utilities/slug";
 import { normalizePortfolioData } from "@/utilities/portfolio-adapter";
 import { DEFAULT_PORTFOLIO_SECTIONS } from "@/config/constants";
 
@@ -263,6 +263,185 @@ export async function getPortfolioFullData(portfolioId: string): Promise<Portfol
   return normalizePortfolioData({
     id: p.id,
     userId: p.user_id,
+    slug: p.slug,
+    title: p.title,
+    templateId: p.template_id,
+    isPublished: p.is_published,
+    isPublic: p.is_public,
+    profile: profile ? {
+      fullName: profile.full_name,
+      headline: profile.headline || "",
+      bio: profile.bio || "",
+      avatarUrl: profile.avatar_url || "",
+      location: profile.location || "",
+      email: profile.email || "",
+      phone: profile.phone || "",
+      isAvailableForWork: profile.is_available_for_work ?? true,
+      resumeUrl: profile.resume_url || "",
+    } : undefined,
+    sections: sections?.map((s) => ({
+      id: s.id,
+      type: s.section_type as SectionType,
+      title: s.title,
+      isVisible: s.is_visible,
+      order: s.sort_order,
+    })),
+    projects: projects?.map((pr) => ({
+      id: pr.id,
+      title: pr.title,
+      shortDescription: pr.short_description,
+      detailedDescription: pr.detailed_description || "",
+      problemStatement: pr.problem_statement || "",
+      solutionApproach: pr.solution_approach || "",
+      technologies: pr.technologies || [],
+      imageUrl: pr.image_url || "",
+      githubUrl: pr.github_url || "",
+      liveDemoUrl: pr.live_demo_url || "",
+      paperUrl: pr.paper_url || "",
+      startDate: pr.start_date || "",
+      endDate: pr.end_date || "",
+      status: pr.is_current ? "IN_PROGRESS" : "COMPLETED",
+      isCurrent: pr.is_current,
+      isFeatured: pr.is_featured,
+      sortOrder: pr.sort_order,
+    })),
+    education: education?.map((e) => ({
+      id: e.id,
+      institution: e.institution,
+      degree: e.degree,
+      fieldOfStudy: e.field_of_study,
+      startYear: e.start_year,
+      endYear: e.end_year,
+      isCurrentStatus: e.is_current_status,
+      cgpa: e.cgpa || "",
+      maxCgpa: e.max_cgpa || "4.0",
+      description: e.description || "",
+      sortOrder: e.sort_order,
+    })),
+    skills: skills?.map((sk) => ({
+      id: sk.id,
+      name: sk.name,
+      category: sk.category as SkillItem["category"],
+      proficiency: sk.proficiency as SkillItem["proficiency"],
+      iconName: sk.icon_name || "",
+      sortOrder: sk.sort_order,
+    })),
+    experience: experience?.map((ex) => ({
+      id: ex.id,
+      company: ex.company,
+      role: ex.role,
+      location: ex.location || "",
+      startDate: ex.start_date,
+      endDate: ex.end_date || "",
+      isCurrent: ex.is_current,
+      description: ex.description,
+      technologies: ex.technologies || [],
+      sortOrder: ex.sort_order,
+    })),
+    research: research?.map((r) => ({
+      id: r.id,
+      title: r.title,
+      description: r.description,
+      researchArea: r.research_area,
+      methodology: r.methodology || "",
+      dataset: r.dataset || "",
+      technologies: r.technologies || [],
+      paperUrl: r.paper_url || "",
+      githubUrl: r.github_url || "",
+      publicationStatus: r.publication_status as ResearchItem["publicationStatus"],
+      publicationDate: r.publication_date || "",
+      venue: r.venue || "",
+      sortOrder: r.sort_order,
+    })),
+    achievements: achievements?.map((a) => ({
+      id: a.id,
+      title: a.title,
+      issuer: a.issuer,
+      date: a.date || "",
+      description: a.description || "",
+      url: a.url || "",
+      sortOrder: a.sort_order,
+    })),
+    certifications: certifications?.map((c) => ({
+      id: c.id,
+      name: c.name,
+      issuingOrganization: c.issuing_organization,
+      issueDate: c.issue_date || "",
+      expiryDate: c.expiry_date || "",
+      credentialId: c.credential_id || "",
+      credentialUrl: c.credential_url || "",
+      sortOrder: c.sort_order,
+    })),
+    socialLinks: socialLinks?.map((s) => ({
+      id: s.id,
+      platform: s.platform,
+      url: s.url,
+      label: s.label || "",
+      sortOrder: s.sort_order,
+    })),
+  });
+}
+
+/**
+ * Public Data Retrieval Service (Phase 5)
+ * Fetches published portfolio data without requiring authentication.
+ * DRAFT PROTECTION: Returns null if is_published is false or slug is invalid/reserved.
+ * PUBLIC DATA SAFETY: Strips sensitive user metadata and internal DB secrets.
+ */
+export async function getPublicPortfolioBySlug(slug: string): Promise<PortfolioData | null> {
+  const normalizedSlug = slug.toLowerCase().trim();
+  if (isReservedSlug(normalizedSlug)) {
+    return null;
+  }
+
+  const supabase = await createClient();
+
+  // 1. Fetch Published Portfolio Meta
+  const { data: p } = await supabase
+    .from("portfolios")
+    .select("*")
+    .eq("slug", normalizedSlug)
+    .eq("is_published", true)
+    .eq("is_public", true)
+    .maybeSingle();
+
+  if (!p) return null;
+
+  const internalUserId = p.user_id;
+
+  // 2. Fetch User Profile
+  const { data: profile } = await supabase.from("profiles").select("*").eq("user_id", internalUserId).maybeSingle();
+
+  // 3. Fetch Sections
+  const { data: sections } = await supabase.from("portfolio_sections").select("*").eq("portfolio_id", p.id).order("sort_order");
+
+  // 4. Fetch Projects
+  const { data: projects } = await supabase.from("projects").select("*").eq("portfolio_id", p.id).order("sort_order");
+
+  // 5. Fetch Education
+  const { data: education } = await supabase.from("education").select("*").eq("portfolio_id", p.id).order("sort_order");
+
+  // 6. Fetch Skills
+  const { data: skills } = await supabase.from("skills").select("*").eq("portfolio_id", p.id).order("sort_order");
+
+  // 7. Fetch Experience
+  const { data: experience } = await supabase.from("experience").select("*").eq("portfolio_id", p.id).order("sort_order");
+
+  // 8. Fetch Research
+  const { data: research } = await supabase.from("research").select("*").eq("portfolio_id", p.id).order("sort_order");
+
+  // 9. Fetch Achievements
+  const { data: achievements } = await supabase.from("achievements").select("*").eq("portfolio_id", p.id).order("sort_order");
+
+  // 10. Fetch Certifications
+  const { data: certifications } = await supabase.from("certifications").select("*").eq("portfolio_id", p.id).order("sort_order");
+
+  // 11. Fetch Social Links
+  const { data: socialLinks } = await supabase.from("social_links").select("*").eq("portfolio_id", p.id).order("sort_order");
+
+  return normalizePortfolioData({
+    id: p.id,
+    userId: "", // Strip internal user_id for public data safety
     slug: p.slug,
     title: p.title,
     templateId: p.template_id,
