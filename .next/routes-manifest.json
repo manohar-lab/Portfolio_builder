@@ -31,6 +31,14 @@
       "namedRegex": "^/dashboard/portfolio/(?<nxtPid>[^/]+?)/achievements(?:/)?$"
     },
     {
+      "page": "/dashboard/portfolio/[id]/editor",
+      "regex": "^/dashboard/portfolio/([^/]+?)/editor(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/dashboard/portfolio/(?<nxtPid>[^/]+?)/editor(?:/)?$"
+    },
+    {
       "page": "/dashboard/portfolio/[id]/education",
       "regex": "^/dashboard/portfolio/([^/]+?)/education(?:/)?$",
       "routeKeys": {

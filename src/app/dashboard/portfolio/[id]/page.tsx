@@ -9,9 +9,6 @@ import {
   GraduationCap,
   Code2,
   Briefcase,
-  BookOpen,
-  Award,
-  Share2,
   Globe,
   ExternalLink,
   CheckCircle2,
@@ -20,6 +17,7 @@ import {
   ArrowLeft,
   Layers,
   Sparkles,
+  Edit3,
 } from "lucide-react";
 
 interface PortfolioDetailsPageProps {
@@ -50,11 +48,17 @@ export default async function PortfolioDetailsPage({ params }: PortfolioDetailsP
         </Link>
 
         <div className="flex items-center gap-3">
+          <Link
+            href={`/dashboard/portfolio/${portfolio.id}/editor`}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-md shadow-indigo-600/30"
+          >
+            <Edit3 className="w-3.5 h-3.5" /> Open Portfolio Editor
+          </Link>
           <a
             href={publicUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors"
           >
             <Globe className="w-3.5 h-3.5 text-blue-400" /> Live Preview <ExternalLink className="w-3 h-3 text-slate-500" />
           </a>
@@ -82,24 +86,33 @@ export default async function PortfolioDetailsPage({ params }: PortfolioDetailsP
             </p>
           </div>
 
-          {/* STATUS TOGGLE FORM */}
-          <form
-            action={async () => {
-              "use server";
-              await updatePortfolioStatusAction(portfolio.id, !portfolio.isPublished);
-            }}
-          >
-            <button
-              type="submit"
-              className={`px-5 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-md flex items-center gap-2 ${
-                portfolio.isPublished
-                  ? "bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30"
-                  : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/20"
-              }`}
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/dashboard/portfolio/${portfolio.id}/editor`}
+              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2"
             >
-              {portfolio.isPublished ? "Unpublish (Set to Draft)" : "Publish Portfolio"}
-            </button>
-          </form>
+              <Edit3 className="w-4 h-4" /> Open Full Editor
+            </Link>
+
+            {/* STATUS TOGGLE FORM */}
+            <form
+              action={async () => {
+                "use server";
+                await updatePortfolioStatusAction(portfolio.id, !portfolio.isPublished);
+              }}
+            >
+              <button
+                type="submit"
+                className={`px-5 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-md flex items-center gap-2 ${
+                  portfolio.isPublished
+                    ? "bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30"
+                    : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/20"
+                }`}
+              >
+                {portfolio.isPublished ? "Unpublish (Set to Draft)" : "Publish Portfolio"}
+              </button>
+            </form>
+          </div>
         </div>
 
         {/* CONTENT SUMMARY METRICS */}
@@ -154,6 +167,17 @@ export default async function PortfolioDetailsPage({ params }: PortfolioDetailsP
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           
           <Link
+            href={`/dashboard/portfolio/${portfolio.id}/editor`}
+            className="p-5 bg-indigo-950/40 border border-indigo-500/30 rounded-2xl hover:border-indigo-400 transition-all space-y-2 group"
+          >
+            <div className="w-9 h-9 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <Edit3 className="w-4 h-4" />
+            </div>
+            <h3 className="font-bold text-white text-base">Full Live Portfolio Editor</h3>
+            <p className="text-xs text-indigo-200/80">Interactive split-screen builder with real-time preview & template switching.</p>
+          </Link>
+
+          <Link
             href={`/dashboard/portfolio/${portfolio.id}/profile`}
             className="p-5 bg-slate-900/80 border border-slate-800 rounded-2xl hover:border-blue-500/40 transition-all space-y-2 group"
           >
@@ -206,39 +230,6 @@ export default async function PortfolioDetailsPage({ params }: PortfolioDetailsP
             </div>
             <h3 className="font-bold text-white text-base">Experience ({portfolio.experience.length})</h3>
             <p className="text-xs text-slate-400">Work history, roles, companies, dates & descriptions.</p>
-          </Link>
-
-          <Link
-            href={`/dashboard/portfolio/${portfolio.id}/research`}
-            className="p-5 bg-slate-900/80 border border-slate-800 rounded-2xl hover:border-blue-500/40 transition-all space-y-2 group"
-          >
-            <div className="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-              <BookOpen className="w-4 h-4" />
-            </div>
-            <h3 className="font-bold text-white text-base">Research ({portfolio.research.length})</h3>
-            <p className="text-xs text-slate-400">Academic papers, methodology, datasets & venues.</p>
-          </Link>
-
-          <Link
-            href={`/dashboard/portfolio/${portfolio.id}/achievements`}
-            className="p-5 bg-slate-900/80 border border-slate-800 rounded-2xl hover:border-blue-500/40 transition-all space-y-2 group"
-          >
-            <div className="w-9 h-9 rounded-xl bg-yellow-500/10 text-yellow-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Award className="w-4 h-4" />
-            </div>
-            <h3 className="font-bold text-white text-base">Achievements & Certifications</h3>
-            <p className="text-xs text-slate-400">Awards, credentials, hackathons & certifications.</p>
-          </Link>
-
-          <Link
-            href={`/dashboard/portfolio/${portfolio.id}/socials`}
-            className="p-5 bg-slate-900/80 border border-slate-800 rounded-2xl hover:border-blue-500/40 transition-all space-y-2 group"
-          >
-            <div className="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Share2 className="w-4 h-4" />
-            </div>
-            <h3 className="font-bold text-white text-base">Social Profiles ({portfolio.socialLinks.length})</h3>
-            <p className="text-xs text-slate-400">GitHub, LinkedIn, Twitter/X, Google Scholar & custom links.</p>
           </Link>
 
         </div>

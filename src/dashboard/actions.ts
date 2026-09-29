@@ -5,6 +5,7 @@ import {
   createPortfolio,
   updatePortfolioMeta,
   deletePortfolio,
+  checkSlugAvailability,
 } from "@/database/portfolio-service";
 import {
   updateProfile,
@@ -27,6 +28,7 @@ import {
 } from "@/database/section-services";
 import { CreatePortfolioSchema } from "@/validation/portfolio.schema";
 import {
+  PortfolioData,
   ProjectItem,
   EducationItem,
   SkillItem,
@@ -37,6 +39,10 @@ import {
   SocialLink,
   UserProfile,
 } from "@/types/portfolio";
+
+export async function checkSlugAvailabilityAction(slug: string, excludePortfolioId?: string) {
+  return await checkSlugAvailability(slug, excludePortfolioId);
+}
 
 export async function createPortfolioAction(formData: FormData) {
   const title = formData.get("title") as string;
@@ -88,6 +94,31 @@ export async function deletePortfolioAction(portfolioId: string) {
     revalidatePath("/dashboard");
   }
   return result;
+}
+
+export async function saveFullPortfolioDraftAction(portfolio: PortfolioData) {
+  try {
+    // 1. Save Meta & Template
+    const metaRes = await updatePortfolioMeta(portfolio.id, {
+      title: portfolio.title,
+      slug: portfolio.slug,
+      templateId: portfolio.templateId,
+    });
+    if (!metaRes.success) return metaRes;
+
+    // 2. Save Profile
+    if (portfolio.profile) {
+      await updateProfile(portfolio.profile);
+    }
+
+    revalidatePath(`/dashboard/portfolio/${portfolio.id}`);
+    revalidatePath(`/dashboard/portfolio/${portfolio.id}/editor`);
+    return { success: true };
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : "Failed to save portfolio draft";
+    console.error("Save draft error:", err);
+    return { success: false, error: errorMsg };
+  }
 }
 
 export async function updateProfileAction(profileData: UserProfile, portfolioId: string) {
