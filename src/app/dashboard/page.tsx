@@ -6,6 +6,7 @@ import { getUserPortfolios } from "@/database/portfolio-service";
 import { getUserOnboardingStatus } from "@/services/onboarding-service";
 import { PortfolioCardActions } from "@/dashboard/PortfolioCardActions";
 import { GitHubIntegrationCard } from "@/dashboard/GitHubIntegrationCard";
+import { FeedbackTriggerButton } from "@/dashboard/FeedbackTriggerButton";
 import {
   PlusCircle,
   Layers,
@@ -57,9 +58,14 @@ export default async function DashboardOverviewPage() {
       {/* WELCOME BANNER & ACTION HEADER */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-8 bg-gradient-to-r from-indigo-950/50 via-slate-900 to-slate-900 border border-slate-800 rounded-3xl">
         <div className="space-y-2">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-            <Sparkles className="w-3.5 h-3.5" /> Workspace Overview
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              <Sparkles className="w-3.5 h-3.5" /> Workspace Overview
+            </span>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20 tracking-wider">
+              Beta Release
+            </span>
+          </div>
           <h1 className="text-3xl font-extrabold text-white">
             Welcome back, {displayName}
           </h1>
@@ -68,7 +74,9 @@ export default async function DashboardOverviewPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <FeedbackTriggerButton />
+
           <Link
             href="/dashboard/templates"
             className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs transition border border-slate-700 flex items-center gap-2"

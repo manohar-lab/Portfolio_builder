@@ -316,3 +316,12 @@ export async function completeOnboardingAction(payload: CompleteOnboardingPayloa
   }
   return res;
 }
+
+/* =========================================================
+ * FEEDBACK ACTIONS (PHASE 11)
+ * ========================================================= */
+import { submitUserFeedback, SubmitFeedbackPayload } from "@/services/feedback-service";
+
+export async function submitFeedbackAction(payload: SubmitFeedbackPayload) {
+  return await submitUserFeedback(payload);
+}

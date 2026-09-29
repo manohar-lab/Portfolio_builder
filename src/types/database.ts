@@ -140,3 +140,12 @@ export interface DbAcademicSemester {
   created_at: string;
   updated_at: string;
 }
+
+export interface DbUserFeedback {
+  id: string;
+  user_id?: string | null;
+  category: "bug" | "feature_request" | "confusing_ux" | "template_feedback" | "other";
+  message: string;
+  contact_email?: string | null;
+  created_at: string;
+}
