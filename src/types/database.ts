@@ -173,4 +173,14 @@ export interface DbCustomDomain {
   updated_at: string;
 }
 
+export interface DbAnalyticsEvent {
+  id: string;
+  event_name: string;
+  user_id?: string | null;
+  portfolio_id?: string | null;
+  metadata?: Record<string, unknown>;
+  created_at: string;
+}
+
+
 

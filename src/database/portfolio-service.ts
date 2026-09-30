@@ -188,6 +188,17 @@ export async function updatePortfolioMeta(portfolioId: string, updates: Partial<
     return { success: false, error: error.message };
   }
 
+  // Fail-safe analytics event tracking
+  if (updates.isPublished !== undefined) {
+    try {
+      const { trackAnalyticsEvent } = await import("@/services/analytics-service");
+      const eventName = updates.isPublished ? "portfolio_published" : "portfolio_unpublished";
+      await trackAnalyticsEvent(eventName, { userId: internalUserId, portfolioId });
+    } catch {
+      // Fail-safe swallow
+    }
+  }
+
   return { success: true };
 }
 

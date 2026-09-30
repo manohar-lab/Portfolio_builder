@@ -148,6 +148,16 @@ export async function completeOnboarding(payload: CompleteOnboardingPayload): Pr
     })
     .eq("user_id", internalUserId);
 
+  // 4. Fail-safe analytics event tracking
+  try {
+    const { trackAnalyticsEvent } = await import("@/services/analytics-service");
+    await trackAnalyticsEvent("onboarding_completed", { userId: internalUserId, portfolioId: newPortfolio.id });
+    await trackAnalyticsEvent("portfolio_created", { userId: internalUserId, portfolioId: newPortfolio.id });
+    await trackAnalyticsEvent("template_selected", { userId: internalUserId, portfolioId: newPortfolio.id, metadata: { templateId: payload.templateId } });
+  } catch {
+    // Fail-safe swallow
+  }
+
   return {
     success: true,
     portfolioId: newPortfolio.id,
