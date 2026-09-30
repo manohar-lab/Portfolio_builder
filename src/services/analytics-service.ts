@@ -22,7 +22,11 @@ export type AnalyticsEventType =
   | "ai_generation_requested"
   | "ai_generation_success"
   | "ai_generation_failed"
-  | "ai_suggestion_accepted";
+  | "ai_suggestion_accepted"
+  | "upgrade_started"
+  | "checkout_completed"
+  | "subscription_activated"
+  | "subscription_cancelled";
 
 export interface TrackEventPayload {
   userId?: string | null;
