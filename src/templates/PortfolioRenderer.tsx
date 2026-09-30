@@ -2,9 +2,11 @@ import React from "react";
 import { PortfolioData } from "@/types/portfolio";
 import { getTemplateById } from "./registry";
 import { Lock, Sparkles } from "lucide-react";
+import { getCssDesignTokens } from "@/utilities/design-token-adapter";
+import { CustomizationConfig } from "@/types/customization";
 
 interface PortfolioRendererProps {
-  data: PortfolioData;
+  data: PortfolioData & { theme_data?: CustomizationConfig };
   isPreview?: boolean;
   mode?: "editor" | "public";
 }
@@ -43,5 +45,12 @@ export const PortfolioRenderer: React.FC<PortfolioRendererProps> = ({
   // Resolve template component from registry
   const TemplateComponent = getTemplateById(data.templateId);
 
-  return <TemplateComponent data={data} isPreview={isPreview} />;
+  // Extract customization design tokens
+  const designTokens = getCssDesignTokens(data.theme_data);
+
+  return (
+    <div style={designTokens} className="portfolio-customization-root w-full min-h-screen">
+      <TemplateComponent data={data} isPreview={isPreview} />
+    </div>
+  );
 };
