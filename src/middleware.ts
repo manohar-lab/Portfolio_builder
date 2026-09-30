@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { normalizeDomain } from "@/utilities/domain-utils";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -8,7 +9,7 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // Apply baseline security headers to all responses
+  // Baseline security headers
   response.headers.set("X-Frame-Options", "DENY");
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -36,6 +37,49 @@ export async function middleware(request: NextRequest) {
     },
   });
 
+  const rawHost = request.headers.get("host") || "";
+  const requestHost = normalizeDomain(rawHost);
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const platformHost = normalizeDomain(appUrl);
+
+  // CUSTOM DOMAIN ROUTING RESOLUTION
+  const isCustomDomain =
+    requestHost &&
+    requestHost !== platformHost &&
+    requestHost !== "localhost" &&
+    !requestHost.includes("127.0.0.1") &&
+    !requestHost.includes("vercel.app");
+
+  if (isCustomDomain) {
+    // Lookup custom domain mapping
+    const { data: domainRecord } = await supabase
+      .from("custom_domains")
+      .select("portfolio_id, status, portfolios(slug, is_published)")
+      .eq("domain", requestHost)
+      .in("status", ["verified", "active"])
+      .maybeSingle();
+
+    const portfolio = domainRecord?.portfolios as unknown as { slug: string; is_published: boolean } | null;
+
+    if (domainRecord && portfolio && portfolio.is_published) {
+      // Rewrite custom domain root or path to public portfolio path
+      const url = request.nextUrl.clone();
+      if (url.pathname === "/" || url.pathname === "") {
+        url.pathname = `/u/${portfolio.slug}`;
+      } else {
+        url.pathname = `/u/${portfolio.slug}${url.pathname}`;
+      }
+      return NextResponse.rewrite(url);
+    } else {
+      // Unrecognized or unpublished custom domain: return 404 cleanly
+      const url = request.nextUrl.clone();
+      url.pathname = "/_not-found";
+      return NextResponse.rewrite(url, { status: 404 });
+    }
+  }
+
+  // Standard platform auth & routing logic
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -43,11 +87,9 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const pathname = url.pathname;
 
-  // Protected route check
   const isProtectedRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/account");
   const isPrivatePage = isProtectedRoute || pathname === "/login" || pathname === "/onboarding";
 
-  // Prevent search engine indexing of private/dashboard routes
   if (isPrivatePage) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow");
   }
@@ -68,13 +110,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public files (images, assets)
-     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

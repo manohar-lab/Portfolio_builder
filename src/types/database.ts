@@ -161,3 +161,16 @@ export interface DbImportHistory {
   created_at: string;
 }
 
+export interface DbCustomDomain {
+  id: string;
+  user_id: string;
+  portfolio_id: string;
+  domain: string;
+  status: "pending" | "verified" | "active" | "failed" | "disconnected";
+  verification_token: string;
+  verified_at?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+

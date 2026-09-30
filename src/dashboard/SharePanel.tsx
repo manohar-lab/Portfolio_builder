@@ -34,6 +34,7 @@ interface SharePanelProps {
   displayName: string;
   headline?: string;
   bio?: string;
+  activeCustomDomain?: string;
   onSlugUpdated?: (newSlug: string) => void;
 }
 
@@ -44,6 +45,7 @@ export function SharePanel({
   displayName,
   headline,
   bio,
+  activeCustomDomain,
   onSlugUpdated,
 }: SharePanelProps) {
   const [copied, setCopied] = useState(false);
@@ -58,7 +60,8 @@ export function SharePanel({
   const [isSavingSlug, setIsSavingSlug] = useState(false);
   const [slugError, setSlugError] = useState<string | null>(null);
 
-  const publicUrl = getCanonicalPublicUrl(slug);
+  const platformUrl = getCanonicalPublicUrl(slug);
+  const publicUrl = activeCustomDomain ? `https://${activeCustomDomain}` : platformUrl;
   const shareTitle = `${displayName} | ${headline || "Portfolio"}`;
   const shareDesc = bio || `Portfolio of ${displayName} — projects, skills, research, and experience.`;
   const socialLinks = generateSocialShareLinks(publicUrl, shareTitle, shareDesc);
