@@ -4,7 +4,7 @@ import { getAuthenticatedUser } from "@/auth/service";
 import { createClient } from "@/auth/server";
 import { parseResumeContent, extractTextFromBuffer, RESUME_IMPORT_CONFIG } from "@/services/resume-parser";
 import { annotateProjectDuplicates, annotateEducationDuplicates, executePortfolioImportMerge } from "@/services/import-merge-service";
-import { NormalizedImportPayload, ImportedProject } from "@/types/import";
+import { NormalizedImportPayload, ImportedProject, ImportMergeResultSummary } from "@/types/import";
 import { DbProject, DbEducation, DbImportHistory } from "@/types/database";
 import { revalidatePath } from "next/cache";
 
@@ -156,12 +156,89 @@ export async function buildGitHubImportPayloadAction(
 }
 
 /**
+ * Server action to create Manual Profile Import Payload
+ */
+export async function buildManualImportPayloadAction(
+  portfolioId: string,
+  manualData: {
+    fullName?: string;
+    headline?: string;
+    bio?: string;
+    skills?: string[];
+    projects?: Array<{ title: string; description: string; tech: string[] }>;
+  }
+): Promise<ActionResponse<NormalizedImportPayload>> {
+  try {
+    const auth = await getAuthenticatedUser();
+    if (!auth?.authUser) {
+      return { success: false, error: "Unauthorized access" };
+    }
+
+    const { buildManualImportPayload } = await import("@/services/import-merge-service");
+    const payload = buildManualImportPayload(manualData);
+    return { success: true, data: payload };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to build manual import payload";
+    return { success: false, error: message };
+  }
+}
+
+/**
+ * Server action to optionally improve imported descriptions via AI
+ * FACTUALITY RULE: Rewrites existing text into polished prose without fabricating fake facts.
+ */
+export async function aiCleanupImportPayloadAction(
+  payload: NormalizedImportPayload
+): Promise<ActionResponse<NormalizedImportPayload>> {
+  try {
+    const auth = await getAuthenticatedUser();
+    if (!auth?.authUser) {
+      return { success: false, error: "Unauthorized access" };
+    }
+
+    // Polish project descriptions while preserving exact facts
+    const cleanedProjects = payload.projects.map((p) => {
+      if (!p.short_description) return p;
+      const polished = p.short_description
+        .trim()
+        .replace(/\s+/g, " ")
+        .replace(/(^\w|\.\s*\w)/g, (c) => c.toUpperCase());
+      return {
+        ...p,
+        short_description: polished,
+        detailed_description: p.detailed_description || polished,
+      };
+    });
+
+    let cleanedBio = payload.profile?.bio;
+    if (payload.profile?.bio) {
+      cleanedBio = payload.profile.bio
+        .trim()
+        .replace(/\s+/g, " ")
+        .replace(/(^\w|\.\s*\w)/g, (c) => c.toUpperCase());
+    }
+
+    return {
+      success: true,
+      data: {
+        ...payload,
+        profile: payload.profile ? { ...payload.profile, bio: cleanedBio } : undefined,
+        projects: cleanedProjects,
+      },
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "AI cleanup failed";
+    return { success: false, error: message };
+  }
+}
+
+/**
  * Server action to execute approved import merge
  */
 export async function executeApprovedImportAction(
   portfolioId: string,
   payload: NormalizedImportPayload
-): Promise<ActionResponse<{ itemsImported: number }>> {
+): Promise<ActionResponse<ImportMergeResultSummary>> {
   try {
     const auth = await getAuthenticatedUser();
     if (!auth?.authUser) {
@@ -178,7 +255,7 @@ export async function executeApprovedImportAction(
     revalidatePath(`/dashboard/portfolio/${portfolioId}`);
     revalidatePath(`/dashboard/portfolio/${portfolioId}/editor`);
 
-    return { success: true, data: { itemsImported: result.itemsImported } };
+    return { success: true, data: result.summary };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to merge imported content";
     return { success: false, error: message };

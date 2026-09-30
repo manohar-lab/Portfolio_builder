@@ -1,16 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { NormalizedImportPayload, ImportedProject, ImportedEducation } from "@/types/import";
-import { executeApprovedImportAction } from "@/dashboard/import-actions";
-import { AlertTriangle, CheckCircle2, ShieldCheck, X, FileText, Github, Check } from "lucide-react";
+import { NormalizedImportPayload, ImportedProject, ImportedEducation, ImportMergeResultSummary } from "@/types/import";
+import { executeApprovedImportAction, aiCleanupImportPayloadAction } from "@/dashboard/import-actions";
+import { AlertTriangle, CheckCircle2, ShieldCheck, X, FileText, Github, Check, Sparkles, Loader2 } from "lucide-react";
 
 interface ImportReviewModalProps {
   portfolioId: string;
   initialPayload: NormalizedImportPayload;
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (itemsImported: number) => void;
+  onSuccess: (summary: ImportMergeResultSummary) => void;
 }
 
 export function ImportReviewModal({
@@ -22,6 +22,7 @@ export function ImportReviewModal({
 }: ImportReviewModalProps) {
   const [payload, setPayload] = useState<NormalizedImportPayload>(initialPayload);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAiCleaning, setIsAiCleaning] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   if (!isOpen) return null;
@@ -98,6 +99,23 @@ export function ImportReviewModal({
     return count;
   };
 
+  const handleAiCleanup = async () => {
+    setIsAiCleaning(true);
+    setErrorMessage(null);
+    try {
+      const res = await aiCleanupImportPayloadAction(payload);
+      if (res.success && res.data) {
+        setPayload(res.data);
+      } else {
+        setErrorMessage(res.error || "AI cleanup failed.");
+      }
+    } catch {
+      setErrorMessage("Unexpected error during AI cleanup.");
+    } finally {
+      setIsAiCleaning(false);
+    }
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setErrorMessage(null);
@@ -105,7 +123,7 @@ export function ImportReviewModal({
     try {
       const res = await executeApprovedImportAction(portfolioId, payload);
       if (res.success && res.data) {
-        onSuccess(res.data.itemsImported);
+        onSuccess(res.data);
         onClose();
       } else {
         setErrorMessage(res.error || "We couldn't complete the import. Please try again.");
@@ -392,6 +410,16 @@ export function ImportReviewModal({
             Cancel Import
           </button>
           <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={handleAiCleanup}
+              disabled={isAiCleaning || isSubmitting}
+              className="px-4 py-2 text-xs font-medium bg-purple-900/40 border border-purple-500/30 hover:bg-purple-900/60 text-purple-200 rounded-lg transition-colors flex items-center gap-1.5 disabled:opacity-50"
+              title="Polishes text descriptions without inventing fake facts"
+            >
+              {isAiCleaning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 text-purple-400" />}
+              <span>Improve Content with AI</span>
+            </button>
             <button
               type="button"
               onClick={() => handleSelectAll(true)}

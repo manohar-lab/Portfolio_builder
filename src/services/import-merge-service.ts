@@ -1,5 +1,13 @@
 import { createClient } from "@/auth/server";
-import { NormalizedImportPayload, ImportedProject, ImportedEducation } from "@/types/import";
+import {
+  NormalizedImportPayload,
+  ImportedProject,
+  ImportedEducation,
+  ImportedSkill,
+  ImportedProfile,
+  FieldConflict,
+  ImportMergeResultSummary,
+} from "@/types/import";
 import { DbProject, DbEducation } from "@/types/database";
 
 /**
@@ -112,13 +120,111 @@ export function annotateEducationDuplicates(
 }
 
 /**
+ * Detect conflicts between existing portfolio profile and imported profile
+ */
+export function detectProfileFieldConflicts(
+  existing?: { full_name?: string; headline?: string; bio?: string },
+  imported?: ImportedProfile
+): FieldConflict[] {
+  if (!existing || !imported) return [];
+
+  const conflicts: FieldConflict[] = [];
+
+  if (
+    existing.headline &&
+    imported.headline &&
+    existing.headline.trim().toLowerCase() !== imported.headline.trim().toLowerCase()
+  ) {
+    conflicts.push({
+      field: "headline",
+      currentValue: existing.headline,
+      importedValue: imported.headline,
+      resolution: "use_imported",
+    });
+  }
+
+  if (
+    existing.bio &&
+    imported.bio &&
+    existing.bio.trim().toLowerCase() !== imported.bio.trim().toLowerCase()
+  ) {
+    conflicts.push({
+      field: "bio",
+      currentValue: existing.bio,
+      importedValue: imported.bio,
+      resolution: "use_imported",
+    });
+  }
+
+  if (
+    existing.full_name &&
+    imported.full_name &&
+    existing.full_name.trim().toLowerCase() !== imported.full_name.trim().toLowerCase()
+  ) {
+    conflicts.push({
+      field: "full_name",
+      currentValue: existing.full_name,
+      importedValue: imported.full_name,
+      resolution: "use_imported",
+    });
+  }
+
+  return conflicts;
+}
+
+/**
+ * Builds a NormalizedImportPayload from manual user entry
+ */
+export function buildManualImportPayload(manualData: {
+  fullName?: string;
+  headline?: string;
+  bio?: string;
+  skills?: string[];
+  projects?: Array<{ title: string; description: string; tech: string[] }>;
+}): NormalizedImportPayload {
+  const skills: ImportedSkill[] = (manualData.skills || []).map((s, i) => ({
+    id: `man-sk-${i + 1}`,
+    name: normalizeSkillName(s),
+    selected: true,
+  }));
+
+  const projects: ImportedProject[] = (manualData.projects || []).map((p, i) => ({
+    id: `man-pr-${i + 1}`,
+    title: p.title,
+    short_description: p.description,
+    detailed_description: p.description,
+    technologies: p.tech || [],
+    selected: true,
+    merge_action: "create_new",
+  }));
+
+  return {
+    source: "manual",
+    profile: {
+      full_name: manualData.fullName,
+      headline: manualData.headline,
+      bio: manualData.bio,
+      selected: !!(manualData.fullName || manualData.headline || manualData.bio),
+    },
+    projects,
+    skills,
+    education: [],
+    experience: [],
+    research: [],
+    achievements: [],
+    certifications: [],
+    socials: [],
+  };
+}
+
+/**
  * Execute Approved Import Merge safely into Supabase Database
  */
 export async function executePortfolioImportMerge(
   portfolioId: string,
   userId: string,
   payload: NormalizedImportPayload
-): Promise<{ success: boolean; itemsImported: number; error?: string }> {
+): Promise<{ success: boolean; summary: ImportMergeResultSummary; error?: string }> {
   const supabase = await createClient();
 
   // 1. Verify Portfolio Ownership
@@ -129,10 +235,17 @@ export async function executePortfolioImportMerge(
     .single();
 
   if (portError || !portfolio || portfolio.user_id !== userId) {
-    return { success: false, itemsImported: 0, error: "Portfolio not found or access denied" };
+    return {
+      success: false,
+      summary: { itemsImported: 0, itemsSkipped: 0, duplicatesCount: 0, warningsCount: 1 },
+      error: "Portfolio not found or access denied",
+    };
   }
 
-  let count = 0;
+  let importedCount = 0;
+  let skippedCount = 0;
+  let duplicatesCount = 0;
+  let warningsCount = 0;
 
   // 2. Profile Data Merge (if selected)
   if (payload.profile && payload.profile.selected) {
@@ -152,7 +265,7 @@ export async function executePortfolioImportMerge(
       .update({ profile_data: updatedProfile, updated_at: new Date().toISOString() })
       .eq("id", portfolioId);
 
-    count += 1;
+    importedCount += 1;
   }
 
   // 3. Skills Merge (avoiding duplicates)
@@ -173,7 +286,10 @@ export async function executePortfolioImportMerge(
       const norm = normalizeSkillName(s.name);
       if (!normalizedSet.has(norm)) {
         normalizedSet.add(norm);
-        count += 1;
+        importedCount += 1;
+      } else {
+        duplicatesCount += 1;
+        skippedCount += 1;
       }
     });
 
@@ -201,7 +317,14 @@ export async function executePortfolioImportMerge(
 
   // 4. Projects Merge
   const selectedProjects = payload.projects.filter((p) => p.selected && p.merge_action !== "skip");
+  const unselectedProjects = payload.projects.filter((p) => !p.selected || p.merge_action === "skip");
+  skippedCount += unselectedProjects.length;
+
   for (const proj of selectedProjects) {
+    if (proj.duplicate_status && proj.duplicate_status !== "none") {
+      duplicatesCount += 1;
+    }
+
     if (proj.merge_action === "create_new") {
       const { error: insertErr } = await supabase.from("projects").insert({
         portfolio_id: portfolioId,
@@ -216,9 +339,10 @@ export async function executePortfolioImportMerge(
         sort_order: 10,
       });
 
-      if (!insertErr) count += 1;
+      if (!insertErr) importedCount += 1;
+      else warningsCount += 1;
     } else if (proj.merge_action === "update_existing" && proj.existing_project_id) {
-      await supabase
+      const { error: updateErr } = await supabase
         .from("projects")
         .update({
           short_description: proj.short_description,
@@ -231,13 +355,18 @@ export async function executePortfolioImportMerge(
         .eq("id", proj.existing_project_id)
         .eq("user_id", userId);
 
-      count += 1;
+      if (!updateErr) importedCount += 1;
+      else warningsCount += 1;
     }
   }
 
   // 5. Education Merge
   const selectedEducation = payload.education.filter((e) => e.selected && e.merge_action !== "skip");
   for (const edu of selectedEducation) {
+    if (edu.duplicate_status && edu.duplicate_status !== "none") {
+      duplicatesCount += 1;
+    }
+
     if (edu.merge_action === "create_new") {
       const { error: eduErr } = await supabase.from("education").insert({
         portfolio_id: portfolioId,
@@ -253,7 +382,8 @@ export async function executePortfolioImportMerge(
         sort_order: 10,
       });
 
-      if (!eduErr) count += 1;
+      if (!eduErr) importedCount += 1;
+      else warningsCount += 1;
     }
   }
 
@@ -263,13 +393,22 @@ export async function executePortfolioImportMerge(
     portfolio_id: portfolioId,
     source: payload.source,
     status: "completed",
-    items_imported_count: count,
+    items_imported_count: importedCount,
     metadata: {
       raw_file_name: payload.raw_file_name || null,
       skills_count: selectedSkills.length,
       projects_count: selectedProjects.length,
+      summary: { importedCount, skippedCount, duplicatesCount, warningsCount },
     },
   });
 
-  return { success: true, itemsImported: count };
+  return {
+    success: true,
+    summary: {
+      itemsImported: importedCount,
+      itemsSkipped: skippedCount,
+      duplicatesCount,
+      warningsCount,
+    },
+  };
 }

@@ -2,9 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { parseUploadedResumeAction, buildGitHubImportPayloadAction, getImportHistoryAction } from "@/dashboard/import-actions";
+import {
+  parseUploadedResumeAction,
+  buildGitHubImportPayloadAction,
+  buildManualImportPayloadAction,
+  getImportHistoryAction,
+} from "@/dashboard/import-actions";
 import { ImportReviewModal } from "@/dashboard/import/ImportReviewModal";
-import { NormalizedImportPayload } from "@/types/import";
+import { NormalizedImportPayload, ImportMergeResultSummary } from "@/types/import";
 import { DbImportHistory } from "@/types/database";
 import { RESUME_IMPORT_CONFIG } from "@/services/resume-parser";
 import {
@@ -18,10 +23,11 @@ import {
   Sparkles,
   ShieldCheck,
   RefreshCw,
+  UserCheck,
 } from "lucide-react";
 
 export default function ImportCenterPage() {
-  const [activeTab, setActiveTab] = useState<"resume" | "github" | "history">("resume");
+  const [activeTab, setActiveTab] = useState<"resume" | "github" | "manual" | "history">("resume");
   const [selectedPortfolioId, setSelectedPortfolioId] = useState<string>("");
   const [portfolios, setPortfolios] = useState<Array<{ id: string; title: string; slug: string }>>([]);
 
@@ -29,6 +35,15 @@ export default function ImportCenterPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isParsing, setIsParsing] = useState(false);
   const [parseError, setParseError] = useState<string | null>(null);
+
+  // Manual Profile States
+  const [manualName, setManualName] = useState("");
+  const [manualHeadline, setManualHeadline] = useState("");
+  const [manualBio, setManualBio] = useState("");
+  const [manualSkills, setManualSkills] = useState("");
+  const [manualProjTitle, setManualProjTitle] = useState("");
+  const [manualProjDesc, setManualProjDesc] = useState("");
+  const [manualProjTech, setManualProjTech] = useState("");
 
   // GitHub States
   const [ghRepos, setGhRepos] = useState<Array<{
@@ -189,10 +204,33 @@ export default function ImportCenterPage() {
     }
   };
 
-  const handleImportSuccess = (count: number) => {
-    setSuccessToast(`Successfully imported and merged ${count} items into your portfolio draft!`);
+  const handleProcessManual = async () => {
+    const skillsList = manualSkills.split(",").map((s) => s.trim()).filter(Boolean);
+    const techList = manualProjTech.split(",").map((t) => t.trim()).filter(Boolean);
+    const projectsList = manualProjTitle.trim()
+      ? [{ title: manualProjTitle.trim(), description: manualProjDesc.trim(), tech: techList }]
+      : [];
+
+    const res = await buildManualImportPayloadAction(selectedPortfolioId, {
+      fullName: manualName.trim(),
+      headline: manualHeadline.trim(),
+      bio: manualBio.trim(),
+      skills: skillsList,
+      projects: projectsList,
+    });
+
+    if (res.success && res.data) {
+      setReviewPayload(res.data);
+      setIsReviewOpen(true);
+    }
+  };
+
+  const handleImportSuccess = (summary: ImportMergeResultSummary) => {
+    setSuccessToast(
+      `Import Summary: ${summary.itemsImported} imported | ${summary.itemsSkipped} skipped | ${summary.duplicatesCount} duplicates detected | ${summary.warningsCount} warnings`
+    );
     refreshHistory();
-    setTimeout(() => setSuccessToast(null), 5000);
+    setTimeout(() => setSuccessToast(null), 6000);
   };
 
   return (
@@ -274,6 +312,16 @@ export default function ImportCenterPage() {
             }`}
           >
             <Github className="w-4 h-4" /> GitHub Repositories
+          </button>
+          <button
+            onClick={() => setActiveTab("manual")}
+            className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition-colors ${
+              activeTab === "manual"
+                ? "border-indigo-500 text-indigo-400"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <UserCheck className="w-4 h-4" /> Manual Entry
           </button>
           <button
             onClick={() => setActiveTab("history")}
@@ -445,7 +493,110 @@ export default function ImportCenterPage() {
           </div>
         )}
 
-        {/* Tab 3: History */}
+        {/* Tab 3: Manual Entry */}
+        {activeTab === "manual" && (
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-6">
+            <div>
+              <h2 className="text-base font-semibold text-slate-100 mb-1">Manual Profile Entry</h2>
+              <p className="text-xs text-slate-400">
+                Directly enter your profile details, skills, and projects to preview and import into your target portfolio.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div>
+                <label className="block text-slate-300 font-medium mb-1">Full Name</label>
+                <input
+                  type="text"
+                  value={manualName}
+                  onChange={(e) => setManualName(e.target.value)}
+                  placeholder="e.g. Alex Rivera"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-medium mb-1">Headline</label>
+                <input
+                  type="text"
+                  value={manualHeadline}
+                  onChange={(e) => setManualHeadline(e.target.value)}
+                  placeholder="e.g. Senior Software Engineer"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-slate-300 font-medium mb-1">About / Bio</label>
+                <textarea
+                  rows={2}
+                  value={manualBio}
+                  onChange={(e) => setManualBio(e.target.value)}
+                  placeholder="e.g. Building distributed backend applications..."
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-slate-300 font-medium mb-1">Skills (Comma Separated)</label>
+                <input
+                  type="text"
+                  value={manualSkills}
+                  onChange={(e) => setManualSkills(e.target.value)}
+                  placeholder="e.g. TypeScript, React, Node.js, PostgreSQL"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div className="md:col-span-2 border-t border-slate-800 pt-4 space-y-3">
+                <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Featured Project Entry</h3>
+                <div>
+                  <label className="block text-slate-300 font-medium mb-1">Project Title</label>
+                  <input
+                    type="text"
+                    value={manualProjTitle}
+                    onChange={(e) => setManualProjTitle(e.target.value)}
+                    placeholder="e.g. Real-Time Distributed KV Store"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 font-medium mb-1">Project Description</label>
+                  <textarea
+                    rows={2}
+                    value={manualProjDesc}
+                    onChange={(e) => setManualProjDesc(e.target.value)}
+                    placeholder="e.g. Implemented Raft consensus in Rust..."
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 font-medium mb-1">Technologies (Comma Separated)</label>
+                  <input
+                    type="text"
+                    value={manualProjTech}
+                    onChange={(e) => setManualProjTech(e.target.value)}
+                    placeholder="e.g. Rust, Raft, Tokio"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={handleProcessManual}
+                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-2"
+              >
+                <Sparkles className="w-4 h-4" />
+                Preview Manual Entry
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 4: History */}
         {activeTab === "history" && (
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
             <h2 className="text-base font-semibold text-slate-100 mb-1">Import History</h2>

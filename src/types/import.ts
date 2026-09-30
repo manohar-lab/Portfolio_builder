@@ -109,9 +109,34 @@ export interface ImportedSocial {
   selected?: boolean;
 }
 
+export interface FieldConflict {
+  field: string;
+  currentValue: string;
+  importedValue: string;
+  resolution: "keep_current" | "use_imported" | "edited";
+  editedValue?: string;
+}
+
+export interface ExistingProfileContext {
+  fullName?: string;
+  headline?: string;
+  bio?: string;
+  location?: string;
+  email?: string;
+}
+
+export interface ImportMergeResultSummary {
+  itemsImported: number;
+  itemsSkipped: number;
+  duplicatesCount: number;
+  warningsCount: number;
+}
+
 export interface NormalizedImportPayload {
   source: "github" | "resume" | "manual";
   raw_file_name?: string;
+  existingContext?: ExistingProfileContext;
+  profileConflicts?: FieldConflict[];
   profile?: ImportedProfile;
   projects: ImportedProject[];
   skills: ImportedSkill[];
@@ -122,3 +147,4 @@ export interface NormalizedImportPayload {
   certifications: ImportedCertification[];
   socials: ImportedSocial[];
 }
+
