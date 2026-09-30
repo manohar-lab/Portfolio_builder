@@ -1,19 +1,51 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { normalizeDomain } from "@/utilities/domain-utils";
+import { generateRequestId } from "@/utilities/observability";
 
 export async function middleware(request: NextRequest) {
+  const requestId = request.headers.get("x-request-id") || generateRequestId();
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   });
 
-  // Baseline security headers
+  // Request correlation & Baseline security headers
+  response.headers.set("X-Request-ID", requestId);
   response.headers.set("X-Frame-Options", "DENY");
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+
+  // MAINTENANCE MODE CHECK (Bypassed for admin/api routes)
+  const isMaintenance = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === "true";
+  const url = request.nextUrl.clone();
+  const pathname = url.pathname;
+
+  if (isMaintenance && !pathname.startsWith("/admin") && !pathname.startsWith("/api") && pathname !== "/login") {
+    return new NextResponse(
+      `<!DOCTYPE html>
+      <html>
+        <head><title>System Maintenance - PortfolioCraft</title><style>body{font-family:sans-serif;background:#0f172a;color:#f8fafc;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center;}h1{font-size:2rem;}p{color:#94a3b8;}</style></head>
+        <body>
+          <div>
+            <h1>Scheduled System Maintenance</h1>
+            <p>PortfolioCraft is currently undergoing scheduled platform maintenance. Please check back shortly.</p>
+          </div>
+        </body>
+      </html>`,
+      {
+        status: 503,
+        headers: {
+          "Content-Type": "text/html",
+          "Cache-Control": "no-store",
+          "X-Request-ID": requestId,
+        },
+      }
+    );
+  }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder-project.supabase.co";
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-anon-key";
@@ -83,9 +115,6 @@ export async function middleware(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const url = request.nextUrl.clone();
-  const pathname = url.pathname;
 
   const isProtectedRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/account");
   const isPrivatePage = isProtectedRoute || pathname === "/login" || pathname === "/onboarding";
