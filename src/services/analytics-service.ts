@@ -18,7 +18,11 @@ export type AnalyticsEventType =
   | "qr_generated"
   | "qr_downloaded"
   | "custom_domain_added"
-  | "custom_domain_verified";
+  | "custom_domain_verified"
+  | "ai_generation_requested"
+  | "ai_generation_success"
+  | "ai_generation_failed"
+  | "ai_suggestion_accepted";
 
 export interface TrackEventPayload {
   userId?: string | null;
@@ -75,6 +79,13 @@ export interface OwnerAnalyticsSummary {
     shareClicked: number;
     qrGenerated: number;
     qrDownloaded: number;
+  };
+  aiStats: {
+    generationsRequested: number;
+    generationsSuccessful: number;
+    generationsFailed: number;
+    suggestionsAccepted: number;
+    acceptanceRate: number;
   };
   recentActivity: Array<{
     id: string;
@@ -192,7 +203,34 @@ export async function getOwnerDashboardMetrics(
     });
   }
 
-  // 8. Recent Operational Activity Stream (last 15 events)
+  // 8. AI Stats from Analytics Events
+  const { data: aiEvents } = await supabase
+    .from("analytics_events")
+    .select("event_name")
+    .in("event_name", ["ai_generation_requested", "ai_generation_success", "ai_generation_failed", "ai_suggestion_accepted"]);
+
+  const aiStats = {
+    generationsRequested: 0,
+    generationsSuccessful: 0,
+    generationsFailed: 0,
+    suggestionsAccepted: 0,
+    acceptanceRate: 0,
+  };
+
+  if (aiEvents) {
+    aiEvents.forEach((e) => {
+      if (e.event_name === "ai_generation_requested") aiStats.generationsRequested++;
+      if (e.event_name === "ai_generation_success") aiStats.generationsSuccessful++;
+      if (e.event_name === "ai_generation_failed") aiStats.generationsFailed++;
+      if (e.event_name === "ai_suggestion_accepted") aiStats.suggestionsAccepted++;
+    });
+
+    aiStats.acceptanceRate = aiStats.generationsSuccessful > 0
+      ? Math.round((aiStats.suggestionsAccepted / aiStats.generationsSuccessful) * 100)
+      : 0;
+  }
+
+  // 9. Recent Operational Activity Stream (last 15 events)
   const { data: recentEvents } = await supabase
     .from("analytics_events")
     .select("*")
@@ -218,6 +256,7 @@ export async function getOwnerDashboardMetrics(
     templateUsage,
     importStats,
     sharingStats,
+    aiStats,
     recentActivity,
   };
 }

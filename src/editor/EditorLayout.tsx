@@ -27,7 +27,10 @@ import {
   RefreshCw,
   Eye,
   Edit3,
+  Sparkles,
 } from "lucide-react";
+
+import { AiAssistantModal } from "./AiAssistantModal";
 
 // Panels
 import { SectionsPanel } from "./panels/SectionsPanel";
@@ -93,6 +96,7 @@ export const EditorLayout: React.FC = () => {
 
   const [mobileTab, setMobileTab] = useState<"edit" | "preview">("edit");
   const [showPublishModal, setShowPublishModal] = useState(false);
+  const [showAiModal, setShowAiModal] = useState(false);
   const [publishWarning, setPublishWarning] = useState<string | null>(null);
 
   // Unsaved changes confirmation warning when navigating away
@@ -212,6 +216,14 @@ export const EditorLayout: React.FC = () => {
               </span>
             )}
           </div>
+
+          {/* AI Assistant Button */}
+          <button
+            onClick={() => setShowAiModal(true)}
+            className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-amber-300" /> AI Assistant
+          </button>
 
           {/* Save Draft Button */}
           <button
@@ -336,6 +348,13 @@ export const EditorLayout: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* AI Assistant Modal */}
+      <AiAssistantModal
+        portfolioId={portfolio.id}
+        isOpen={showAiModal}
+        onClose={() => setShowAiModal(false)}
+      />
 
       {/* Publish Confirmation Modal */}
       {showPublishModal && (
