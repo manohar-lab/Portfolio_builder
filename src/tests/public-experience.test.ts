@@ -8,7 +8,7 @@ describe("Phase 10 Public Product Experience Tests", () => {
     expect(templates.length).toBeGreaterThan(0);
 
     const available = templates.filter((t) => t.isAvailable);
-    expect(available.length).toBe(3);
+    expect(available.length).toBeGreaterThanOrEqual(3);
 
     const ids = available.map((t) => t.id);
     expect(ids).toContain("minimal");

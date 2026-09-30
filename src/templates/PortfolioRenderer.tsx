@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { PortfolioData } from "@/types/portfolio";
 import { getTemplateById } from "./registry";
@@ -42,7 +44,7 @@ export const PortfolioRenderer: React.FC<PortfolioRendererProps> = ({
     );
   }
 
-  // Resolve template component from registry
+  // Resolve template component from registry with fallback protection
   const TemplateComponent = getTemplateById(data.templateId);
 
   // Extract customization design tokens
@@ -50,7 +52,58 @@ export const PortfolioRenderer: React.FC<PortfolioRendererProps> = ({
 
   return (
     <div style={designTokens} className="portfolio-customization-root w-full min-h-screen">
-      <TemplateComponent data={data} isPreview={isPreview} />
+      <TemplateErrorBoundary fallbackTemplateId="minimal" data={data} isPreview={isPreview}>
+        <TemplateComponent data={data} isPreview={isPreview} />
+      </TemplateErrorBoundary>
     </div>
   );
 };
+
+interface TemplateErrorBoundaryProps {
+  children: React.ReactNode;
+  fallbackTemplateId: string;
+  data: PortfolioData;
+  isPreview?: boolean;
+}
+
+interface TemplateErrorBoundaryState {
+  hasError: boolean;
+}
+
+/**
+ * Class-based Error Boundary to catch template render errors gracefully
+ */
+class TemplateErrorBoundary extends React.Component<
+  TemplateErrorBoundaryProps,
+  TemplateErrorBoundaryState
+> {
+  constructor(props: TemplateErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("Template render failure caught by TemplateErrorBoundary:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      const FallbackComp = getTemplateById(this.props.fallbackTemplateId);
+      return (
+        <div className="w-full min-h-screen">
+          <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-center text-xs text-amber-400 font-medium">
+            Selected template is temporarily unavailable. Displaying safe fallback layout.
+          </div>
+          <FallbackComp data={this.props.data} isPreview={this.props.isPreview} />
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
