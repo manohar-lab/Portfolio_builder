@@ -17,6 +17,7 @@ describe("Phase 7 Onboarding, Template Gallery & Customization Tests", () => {
       templateId: "developer",
       isPublished: false,
       isPublic: true,
+      visibilityMode: "unlisted",
       profile: {
         fullName: "New Developer",
         headline: "",

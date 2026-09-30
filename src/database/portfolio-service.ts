@@ -57,6 +57,7 @@ export async function getUserPortfolios(): Promise<PortfolioMeta[]> {
     status: p.is_published ? "PUBLISHED" : "DRAFT",
     isPublished: p.is_published,
     isPublic: p.is_public,
+    visibilityMode: p.visibility_mode || (p.is_published ? "unlisted" : "private"),
     templateId: p.template_id,
     createdAt: p.created_at,
     updatedAt: p.updated_at,
@@ -90,6 +91,7 @@ export async function getPortfolioById(portfolioId: string): Promise<PortfolioMe
     status: data.is_published ? "PUBLISHED" : "DRAFT",
     isPublished: data.is_published,
     isPublic: data.is_public,
+    visibilityMode: data.visibility_mode || (data.is_published ? "unlisted" : "private"),
     templateId: data.template_id,
     createdAt: data.created_at,
     updatedAt: data.updated_at,
@@ -118,6 +120,7 @@ export async function createPortfolio(payload: { title: string; slug: string; te
       template_id: payload.templateId || "developer",
       is_published: false, // Starts as DRAFT
       is_public: true,
+      visibility_mode: "unlisted", // Default privacy safe
     })
     .select()
     .single();
@@ -150,6 +153,7 @@ export async function createPortfolio(payload: { title: string; slug: string; te
       status: "DRAFT",
       isPublished: false,
       isPublic: true,
+      visibilityMode: "unlisted",
       templateId: newPortfolio.template_id,
       createdAt: newPortfolio.created_at,
       updatedAt: newPortfolio.updated_at,

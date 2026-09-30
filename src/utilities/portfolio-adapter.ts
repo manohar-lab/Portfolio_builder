@@ -20,6 +20,8 @@ export function normalizePortfolioData(raw: Partial<PortfolioData>): PortfolioDa
     templateId: raw.templateId || "developer",
     isPublished: raw.isPublished ?? true,
     isPublic: raw.isPublic ?? true,
+    visibilityMode: raw.visibilityMode || (raw.isPublic ? "unlisted" : "private"),
+    isFeatured: raw.isFeatured ?? false,
     profile: {
       fullName: raw.profile?.fullName || "Jane Doe",
       headline: raw.profile?.headline || "Senior Full Stack Engineer & Open Source Contributor",

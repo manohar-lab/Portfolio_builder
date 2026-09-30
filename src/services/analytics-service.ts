@@ -26,7 +26,12 @@ export type AnalyticsEventType =
   | "upgrade_started"
   | "checkout_completed"
   | "subscription_activated"
-  | "subscription_cancelled";
+  | "subscription_cancelled"
+  | "portfolio_discovery_enabled"
+  | "portfolio_discovery_disabled"
+  | "showcase_view"
+  | "portfolio_card_clicked"
+  | "showcase_search";
 
 export interface TrackEventPayload {
   userId?: string | null;

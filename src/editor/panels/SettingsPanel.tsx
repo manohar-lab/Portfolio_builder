@@ -62,13 +62,13 @@ export const SettingsPanel: React.FC = () => {
           )}
         </div>
 
-        {/* PUBLICATION CONTROL BOX */}
-        <div className="p-6 bg-gray-50 border border-gray-200 rounded-2xl space-y-4">
+        {/* PUBLICATION & VISIBILITY CONTROL BOX */}
+        <div className="p-6 bg-gray-50 border border-gray-200 rounded-2xl space-y-6">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-bold text-gray-900 text-base">Publication Status</h3>
               <p className="text-xs text-gray-600">
-                {portfolio.isPublished ? "Portfolio is currently live and viewable at /u/" + portfolio.slug : "Portfolio is in Draft mode and private."}
+                {portfolio.isPublished ? "Portfolio is live and viewable." : "Portfolio is in Draft mode and private."}
               </p>
             </div>
 
@@ -83,7 +83,7 @@ export const SettingsPanel: React.FC = () => {
             )}
           </div>
 
-          <div className="pt-2 border-t border-gray-200">
+          <div className="pt-2">
             <button
               type="button"
               onClick={() => publishPortfolio(!portfolio.isPublished)}
@@ -96,9 +96,70 @@ export const SettingsPanel: React.FC = () => {
               {portfolio.isPublished ? "Set Portfolio to Draft" : "Publish Portfolio Live"}
             </button>
           </div>
+
+          {/* DISCOVERY VISIBILITY MODEL */}
+          <div className="pt-4 border-t border-gray-200 space-y-3">
+            <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
+              Portfolio Visibility Settings
+            </h4>
+
+            <div className="space-y-2">
+              <label className="flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-indigo-300 transition">
+                <input
+                  type="radio"
+                  name="visibilityMode"
+                  value="private"
+                  checked={(portfolio.visibilityMode || "unlisted") === "private"}
+                  onChange={() => updatePortfolio((prev) => ({ ...prev, visibilityMode: "private", isPublic: false }))}
+                  className="mt-0.5 text-indigo-600 focus:ring-indigo-500"
+                />
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold text-gray-900 block">Private</span>
+                  <p className="text-[11px] text-gray-500">
+                    Portfolio is not publicly accessible via link or discovery showcase.
+                  </p>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-indigo-300 transition">
+                <input
+                  type="radio"
+                  name="visibilityMode"
+                  value="unlisted"
+                  checked={(portfolio.visibilityMode || "unlisted") === "unlisted"}
+                  onChange={() => updatePortfolio((prev) => ({ ...prev, visibilityMode: "unlisted", isPublic: true }))}
+                  className="mt-0.5 text-indigo-600 focus:ring-indigo-500"
+                />
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold text-gray-900 block">Unlisted</span>
+                  <p className="text-[11px] text-gray-500">
+                    Accessible to anyone with the direct URL, but hidden from the public showcase directory.
+                  </p>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-indigo-300 transition">
+                <input
+                  type="radio"
+                  name="visibilityMode"
+                  value="public"
+                  checked={(portfolio.visibilityMode || "unlisted") === "public"}
+                  onChange={() => updatePortfolio((prev) => ({ ...prev, visibilityMode: "public", isPublic: true }))}
+                  className="mt-0.5 text-indigo-600 focus:ring-indigo-500"
+                />
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold text-gray-900 block">Public (Discoverable)</span>
+                  <p className="text-[11px] text-gray-500">
+                    Published and discoverable on the platform&apos;s public showcase (/explore) and sitemap.
+                  </p>
+                </div>
+              </label>
+            </div>
+          </div>
         </div>
 
       </div>
     </div>
   );
 };
+

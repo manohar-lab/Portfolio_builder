@@ -183,6 +183,12 @@
       "namedRegex": "^/dashboard/templates(?:/)?$"
     },
     {
+      "page": "/explore",
+      "regex": "^/explore(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/explore(?:/)?$"
+    },
+    {
       "page": "/login",
       "regex": "^/login(?:/)?$",
       "routeKeys": {},
@@ -211,6 +217,12 @@
       "regex": "^/robots\\.txt(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/robots\\.txt(?:/)?$"
+    },
+    {
+      "page": "/showcase",
+      "regex": "^/showcase(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/showcase(?:/)?$"
     },
     {
       "page": "/sitemap.xml",

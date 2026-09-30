@@ -242,6 +242,8 @@ export interface ThemeConfig {
 
 export type PortfolioStatus = "DRAFT" | "PUBLISHED";
 
+export type VisibilityMode = "private" | "unlisted" | "public";
+
 export interface PortfolioMeta {
   id: string;
   userId: string;
@@ -251,6 +253,8 @@ export interface PortfolioMeta {
   status: PortfolioStatus;
   isPublished: boolean;
   isPublic: boolean;
+  visibilityMode: VisibilityMode;
+  isFeatured?: boolean;
   templateId: string;
   createdAt: string;
   updatedAt: string;

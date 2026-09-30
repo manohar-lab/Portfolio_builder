@@ -16,6 +16,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1.0,
     },
     {
+      url: `${baseUrl}/explore`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
       url: `${baseUrl}/login`,
       lastModified: new Date(),
       changeFrequency: "monthly",
@@ -34,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .from("portfolios")
       .select("slug, updated_at")
       .eq("is_published", true)
-      .eq("is_public", true);
+      .eq("visibility_mode", "public");
 
     if (publishedPortfolios && publishedPortfolios.length > 0) {
       const dynamicEntries: MetadataRoute.Sitemap = publishedPortfolios.map((p) => ({
@@ -52,3 +58,4 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return staticEntries;
 }
+
