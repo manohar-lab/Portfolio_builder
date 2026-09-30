@@ -2,19 +2,19 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
 <loc>http://localhost:3000</loc>
-<lastmod>2026-09-30T07:18:24.235Z</lastmod>
+<lastmod>2026-09-30T09:01:59.464Z</lastmod>
 <changefreq>daily</changefreq>
 <priority>1</priority>
 </url>
 <url>
 <loc>http://localhost:3000/login</loc>
-<lastmod>2026-09-30T07:18:24.235Z</lastmod>
+<lastmod>2026-09-30T09:01:59.464Z</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 <url>
 <loc>http://localhost:3000/templates</loc>
-<lastmod>2026-09-30T07:18:24.235Z</lastmod>
+<lastmod>2026-09-30T09:01:59.464Z</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.8</priority>
 </url>
