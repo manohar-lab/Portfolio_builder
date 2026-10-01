@@ -3,9 +3,18 @@ import { DbAnalyticsEvent } from "@/types/database";
 
 export type AnalyticsEventType =
   | "user_signed_up"
+  | "onboarding_started"
+  | "profile_type_selected"
+  | "source_selected"
   | "onboarding_completed"
   | "portfolio_created"
+  | "template_previewed"
   | "template_selected"
+  | "customization_started"
+  | "preview_viewed"
+  | "publish_started"
+  | "publish_completed"
+  | "onboarding_abandoned"
   | "project_added"
   | "github_import_started"
   | "github_import_completed"

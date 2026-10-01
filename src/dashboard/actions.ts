@@ -296,6 +296,7 @@ export async function disconnectGitHubAction() {
 import {
   getUserOnboardingStatus,
   saveOnboardingStep,
+  resetOnboardingState,
   completeOnboarding,
   CompleteOnboardingPayload,
 } from "@/services/onboarding-service";
@@ -306,6 +307,14 @@ export async function getOnboardingStatusAction() {
 
 export async function saveOnboardingStepAction(step: number, profileType?: string) {
   return await saveOnboardingStep(step, profileType);
+}
+
+export async function resetOnboardingAction() {
+  const res = await resetOnboardingState();
+  if (res.success) {
+    revalidatePath("/onboarding");
+  }
+  return res;
 }
 
 export async function completeOnboardingAction(payload: CompleteOnboardingPayload) {
