@@ -28,6 +28,11 @@ import {
   Eye,
   Edit3,
   Sparkles,
+  Undo2,
+  Redo2,
+  Monitor,
+  Tablet,
+  Smartphone,
 } from "lucide-react";
 
 import { AiAssistantModal } from "./AiAssistantModal";
@@ -92,9 +97,14 @@ export const EditorLayout: React.FC = () => {
     setActivePanel,
     saveDraft,
     publishPortfolio,
+    canUndo,
+    canRedo,
+    undo,
+    redo,
   } = useEditor();
 
   const [mobileTab, setMobileTab] = useState<"edit" | "preview">("edit");
+  const [deviceMode, setDeviceMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [showAiModal, setShowAiModal] = useState(false);
   const [publishWarning, setPublishWarning] = useState<string | null>(null);
@@ -110,6 +120,32 @@ export const EditorLayout: React.FC = () => {
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isDirty]);
+
+  // Keyboard shortcuts for Undo / Redo
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
+        if (e.shiftKey) {
+          if (canRedo) {
+            e.preventDefault();
+            redo();
+          }
+        } else {
+          if (canUndo) {
+            e.preventDefault();
+            undo();
+          }
+        }
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "y") {
+        if (canRedo) {
+          e.preventDefault();
+          redo();
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [canUndo, canRedo, undo, redo]);
 
   const handlePublishClick = () => {
     // Validate required public profile fields
@@ -175,6 +211,26 @@ export const EditorLayout: React.FC = () => {
             {portfolio.status}
           </span>
 
+          {/* Undo / Redo Toolbar */}
+          <div className="hidden md:flex items-center gap-1 border-l border-r border-gray-200 px-2 mx-1">
+            <button
+              onClick={undo}
+              disabled={!canUndo}
+              title="Undo change (Ctrl+Z)"
+              className="p-1 rounded text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition"
+            >
+              <Undo2 className="h-4 w-4" />
+            </button>
+            <button
+              onClick={redo}
+              disabled={!canRedo}
+              title="Redo change (Ctrl+Y)"
+              className="p-1 rounded text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition"
+            >
+              <Redo2 className="h-4 w-4" />
+            </button>
+          </div>
+
           {/* Portfolio Readiness Badge */}
           {(() => {
             const readiness = calculatePortfolioReadiness(portfolio);
@@ -210,7 +266,18 @@ export const EditorLayout: React.FC = () => {
                 <CheckCircle2 className="h-3.5 w-3.5" /> Saved ({lastSaved})
               </span>
             )}
-            {isDirty && (
+            {saveStatus === "error" && (
+              <div className="flex items-center gap-1 text-rose-600 font-medium">
+                <AlertTriangle className="h-3.5 w-3.5" /> Unable to save
+                <button
+                  onClick={() => saveDraft()}
+                  className="underline hover:text-rose-800 ml-1 text-[11px]"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+            {isDirty && saveStatus !== "error" && saveStatus !== "saving" && (
               <span className="flex items-center gap-1 text-amber-600 font-medium">
                 <AlertTriangle className="h-3.5 w-3.5" /> Unsaved changes
               </span>
@@ -328,7 +395,7 @@ export const EditorLayout: React.FC = () => {
             mobileTab === "edit" ? "hidden md:flex md:flex-col" : "flex flex-col"
           }`}
         >
-          {/* Preview Header Bar */}
+          {/* Preview Header Bar with Device Toggles */}
           <div className="flex h-10 w-full items-center justify-between border-b border-gray-800 bg-gray-950 px-4 text-xs text-gray-400">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
@@ -337,12 +404,52 @@ export const EditorLayout: React.FC = () => {
                 ({portfolio.templateId} template)
               </span>
             </div>
-            <div className="text-[11px] text-gray-500">Owner Preview Mode</div>
+
+            {/* Device Viewport Selector */}
+            <div className="flex items-center gap-1 bg-gray-900 rounded-lg p-0.5 border border-gray-800">
+              <button
+                onClick={() => setDeviceMode("desktop")}
+                title="Desktop View (100%)"
+                className={`p-1 rounded transition ${
+                  deviceMode === "desktop" ? "bg-indigo-600 text-white" : "text-gray-400 hover:text-gray-200"
+                }`}
+              >
+                <Monitor className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => setDeviceMode("tablet")}
+                title="Tablet View (768px)"
+                className={`p-1 rounded transition ${
+                  deviceMode === "tablet" ? "bg-indigo-600 text-white" : "text-gray-400 hover:text-gray-200"
+                }`}
+              >
+                <Tablet className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => setDeviceMode("mobile")}
+                title="Mobile View (375px)"
+                className={`p-1 rounded transition ${
+                  deviceMode === "mobile" ? "bg-indigo-600 text-white" : "text-gray-400 hover:text-gray-200"
+                }`}
+              >
+                <Smartphone className="h-3.5 w-3.5" />
+              </button>
+            </div>
+
+            <div className="text-[11px] text-gray-500 hidden sm:block">Owner Preview Mode</div>
           </div>
 
-          {/* Template Renderer Preview Window */}
-          <div className="flex-1 overflow-y-auto p-2 sm:p-6 bg-gray-900">
-            <div className="mx-auto max-w-5xl rounded-2xl bg-white shadow-2xl overflow-hidden min-h-[600px]">
+          {/* Template Renderer Preview Window with Device Frame */}
+          <div className="flex-1 overflow-y-auto p-2 sm:p-6 bg-gray-900 flex justify-center">
+            <div
+              className={`rounded-2xl bg-white shadow-2xl overflow-hidden min-h-[600px] transition-all duration-300 ${
+                deviceMode === "desktop"
+                  ? "w-full max-w-5xl"
+                  : deviceMode === "tablet"
+                  ? "w-[768px] max-w-full my-auto"
+                  : "w-[375px] max-w-full my-auto border-8 border-gray-800 rounded-[32px]"
+              }`}
+            >
               <PortfolioRenderer data={portfolio} isPreview={true} />
             </div>
           </div>

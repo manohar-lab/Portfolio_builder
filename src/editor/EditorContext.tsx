@@ -20,15 +20,23 @@ interface EditorContextType {
   changeTemplate: (templateId: string) => void;
   saveDraft: () => Promise<boolean>;
   publishPortfolio: (publish: boolean) => Promise<boolean>;
+  canUndo: boolean;
+  canRedo: boolean;
+  undo: () => void;
+  redo: () => void;
 }
 
 const EditorContext = createContext<EditorContextType | null>(null);
+
+const MAX_HISTORY = 30;
 
 export const EditorProvider: React.FC<{
   initialData: PortfolioData;
   children: React.ReactNode;
 }> = ({ initialData, children }) => {
   const [portfolio, setPortfolio] = useState<PortfolioData>(initialData);
+  const [past, setPast] = useState<PortfolioData[]>([]);
+  const [future, setFuture] = useState<PortfolioData[]>([]);
   const [isDirty, setIsDirty] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [lastSaved, setLastSaved] = useState<string | null>(new Date().toLocaleTimeString());
@@ -37,11 +45,36 @@ export const EditorProvider: React.FC<{
   const updatePortfolio = useCallback((updater: (prev: PortfolioData) => PortfolioData) => {
     setPortfolio((prev) => {
       const updated = updater(prev);
-      return { ...updated, updatedAt: new Date().toISOString() };
+      const timestamped = { ...updated, updatedAt: new Date().toISOString() };
+      setPast((history) => [...history.slice(-MAX_HISTORY), prev]);
+      setFuture([]);
+      return timestamped;
     });
     setIsDirty(true);
     setSaveStatus("idle");
   }, []);
+
+  const undo = useCallback(() => {
+    if (past.length === 0) return;
+    const previous = past[past.length - 1];
+    const newPast = past.slice(0, past.length - 1);
+    setFuture((f) => [portfolio, ...f]);
+    setPast(newPast);
+    setPortfolio(previous);
+    setIsDirty(true);
+    setSaveStatus("idle");
+  }, [past, portfolio]);
+
+  const redo = useCallback(() => {
+    if (future.length === 0) return;
+    const next = future[0];
+    const newFuture = future.slice(1);
+    setPast((p) => [...p, portfolio]);
+    setFuture(newFuture);
+    setPortfolio(next);
+    setIsDirty(true);
+    setSaveStatus("idle");
+  }, [future, portfolio]);
 
   // Section Visibility Toggle (CRITICAL RULE: Disabling a section does NOT delete its data)
   const toggleSectionVisibility = useCallback((sectionType: string) => {
@@ -164,6 +197,10 @@ export const EditorProvider: React.FC<{
         changeTemplate,
         saveDraft,
         publishPortfolio,
+        canUndo: past.length > 0,
+        canRedo: future.length > 0,
+        undo,
+        redo,
       }}
     >
       {children}
