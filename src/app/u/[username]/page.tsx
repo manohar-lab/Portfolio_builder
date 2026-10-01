@@ -45,8 +45,8 @@ export async function generateMetadata({ params }: PublicPortfolioPageProps): Pr
       canonical: canonicalUrl,
     },
     robots: {
-      index: true,
-      follow: true,
+      index: portfolio.visibilityMode === "public",
+      follow: portfolio.visibilityMode === "public",
     },
     openGraph: {
       title: `${fullName} — ${headline}`,
