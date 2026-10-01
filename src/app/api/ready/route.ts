@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/auth/server";
+import { validateEnvironmentVariables } from "@/config/env-validator";
 
 export async function GET() {
   const startTime = Date.now();
@@ -21,7 +22,8 @@ export async function GET() {
     dbHealthy = false;
   }
 
-  const isReady = dbHealthy;
+  const envCheck = validateEnvironmentVariables();
+  const isReady = dbHealthy && envCheck.valid;
   const status = isReady ? "ready" : "degraded";
   const statusCode = isReady ? 200 : 503;
 
@@ -30,16 +32,28 @@ export async function GET() {
       status,
       timestamp: new Date().toISOString(),
       durationMs: Date.now() - startTime,
-      checks: {
+      dependencies: {
         database: {
+          required: true,
           status: dbHealthy ? "healthy" : "unhealthy",
           latencyMs: dbLatencyMs,
         },
-        aiService: {
-          status: "available",
+        environmentConfig: {
+          required: true,
+          status: envCheck.valid ? "healthy" : "invalid",
+          missingCount: envCheck.missingRequired.length,
         },
-        billingService: {
-          status: "operational",
+        gitHubIntegration: {
+          required: false,
+          status: envCheck.optionalStatus["GITHUB_CLIENT_ID"] === "configured" ? "configured" : "optional_missing",
+        },
+        openAiService: {
+          required: false,
+          status: envCheck.optionalStatus["OPENAI_API_KEY"] === "configured" ? "configured" : "optional_missing",
+        },
+        stripeBilling: {
+          required: false,
+          status: envCheck.optionalStatus["STRIPE_SECRET_KEY"] === "configured" ? "configured" : "optional_missing",
         },
       },
     },
@@ -47,6 +61,7 @@ export async function GET() {
       status: statusCode,
       headers: {
         "Cache-Control": "no-store, max-age=0",
+        "Content-Type": "application/json",
       },
     }
   );
