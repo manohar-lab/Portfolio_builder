@@ -71,6 +71,71 @@ Portfolios are accessible via clean, scalable public URLs:
 - **Isolation**: Each user has ownership over their unique slug.
 
 ---
+## 🚧 Development Status
+
+PortfolioCraft is currently under active development.
+
+### Current Phase
+
+**Phase 0 — Architecture & Foundation ✅**
+
+The initial architecture and technical foundation have been established, including:
+
+* ✅ Next.js 15 App Router setup
+* ✅ TypeScript with strict mode
+* ✅ Tailwind CSS integration
+* ✅ PostgreSQL / Supabase-compatible database architecture
+* ✅ Multi-user database design
+* ✅ Row Level Security (RLS) strategy
+* ✅ Standardized `PortfolioData` architecture
+* ✅ Public portfolio URL strategy using `/u/[username]`
+* ✅ Reserved username/slug protection
+* ✅ Zod validation architecture
+* ✅ Vitest testing setup
+* ✅ Template-based portfolio architecture
+* ✅ Scalable project folder structure
+
+### Upcoming Development
+
+**Phase 1 — Authentication & Dashboard**
+
+Planned work includes:
+
+* User authentication
+* User profile management
+* Portfolio creation
+* Portfolio dashboard
+* Portfolio settings
+* Username management
+* Database integration
+* Protected dashboard routes
+
+**Phase 2 — Portfolio Editor**
+
+Planned work includes:
+
+* Visual portfolio editor
+* Profile editing
+* Project management
+* Education and experience management
+* Skills and certifications
+* Research and publications
+* Social links
+* Section visibility controls
+* Live preview
+
+**Phase 3 — Templates & Publishing**
+
+Planned work includes:
+
+* Multiple portfolio templates
+* Template switching
+* Responsive public portfolios
+* Publishing workflow
+* Public portfolio sharing
+* SEO optimization
+
+> PortfolioCraft is being developed incrementally with a focus on security, scalability, reusable architecture, and a consistent portfolio data model.
 
 ## 🛠️ Commands
 
